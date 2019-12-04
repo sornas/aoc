@@ -1,0 +1,4 @@
+*.out
+*.pdf
+pdf.log
+__pycache__
