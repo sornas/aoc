@@ -1,8 +1,6 @@
 import sys
 
-program = input().split(",")
-for i in range(len(program)):
-    program[i] = int(program[i])
+program = [int(x) for x in input().split(",")]
 
 for n in range(100):
     for v in range(100):

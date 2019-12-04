@@ -1,12 +1,10 @@
 import math
 
 def intersection(l1, l2):
-    tmp = set(l1)
-    return [value for value in l2 if value in tmp]
+    return [value for value in l2 if value in l1]
 
 def man_dist(point):
     return abs(point[0]) + abs(point[1])
-
 
 wire1 = {}
 wire2 = {}
@@ -37,9 +35,6 @@ for wire in (wire1, wire2):
             wire[(x, y)] = steps
 
 points = intersection(list(wire1.keys()), list(wire2.keys()))
-print(len(points))
-for point in points:
-    print(point, wire1[point], wire2[point])
 length = wire1[points[0]] + wire2[points[0]]
 for point in points[1:]:
     length = min(length, wire1[point] + wire2[point])
