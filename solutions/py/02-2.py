@@ -1,6 +1,9 @@
 import sys
+import time
 
-program = [int(x) for x in input().split(",")]
+program = [int(x) for x in input().split(" ")]
+
+start = time.time()
 
 for n in range(100):
     for v in range(100):
@@ -17,7 +20,9 @@ for n in range(100):
             elif memory[pointer] == 2:
                 memory[memory[pointer+3]] = memory[memory[pointer+1]] * memory[memory[pointer+2]]
             pointer += 4
-        print(n, v, memory[0])
+        # print(n, v, memory[0])
         if memory[0] == 19690720:
+            print(n, v)
+            print("took " + str(time.time() - start))
             sys.exit()
 
