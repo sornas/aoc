@@ -10,11 +10,10 @@ def isIncreasing(num):
     return True
 
 def pt1(input):
-    return
     def containsDouble(num):
         s = str(num)
         amounts = []
-        for n in (0,1,2,3,4,5,6,7,8,9):
+        for n in (0,1,2,3,4,5,6,7,8,9):  # herregud
             amounts.append(s.count(str(n)))
         c = Counter(amounts)
         return c[0] + c[1] < 10
@@ -27,11 +26,10 @@ def pt1(input):
     return amount
 
 def pt2(input):
-    return
     def containsDouble(num):
         s = str(num)
         amounts = []
-        for n in (0,1,2,3,4,5,6,7,8,9):
+        for n in (0,1,2,3,4,5,6,7,8,9):  # herregud
             amounts.append(s.count(str(n)))
         c = Counter(amounts)
         if c[0] + c[1] < 10:
@@ -43,3 +41,6 @@ def pt2(input):
                 amount += 1
     return amount
 
+if __name__ == "__main__":
+    import cProfile
+    cProfile.run("pt1([])")
