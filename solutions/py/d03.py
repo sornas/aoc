@@ -73,3 +73,12 @@ def pt2(input):
     for point in points[1:]:
         length = min(length, wire1[point] + wire2[point])
     return length
+
+if __name__ == "__main__":
+    import cProfile
+
+    input = open("../input/03", "r").readlines()
+    cProfile.run("pt1(input)")
+    cProfile.run("pt2(input)")
+    print(pt1(input))
+    print(pt2(input))

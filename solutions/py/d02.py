@@ -39,3 +39,11 @@ def pt2(input):
             if memory[0] == 19690720:
                 return (n, v)
 
+if __name__ == "__main__":
+    import cProfile
+
+    input = open("../input/02", "r").readlines()
+    cProfile.run("pt1(input)")
+    cProfile.run("pt2(input)")
+    print(pt1(input))
+    print(pt2(input))
