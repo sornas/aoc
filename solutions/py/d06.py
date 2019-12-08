@@ -76,3 +76,12 @@ def pt2(input):
             tar_dist += 1
             if src_parent == tar_parent:
                 return (src_parent.name, src_dist, tar_dist, src_dist + tar_dist)
+
+if __name__ == "__main__":
+    import cProfile
+
+    input = open("../input/06", "r").readlines()
+    cProfile.run("pt1(input)")
+    cProfile.run("pt2(input)")
+    print(pt1(input))
+    print(pt2(input))

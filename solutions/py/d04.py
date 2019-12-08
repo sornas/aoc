@@ -44,5 +44,6 @@ def pt2(input):
 
 if __name__ == "__main__":
     import cProfile
+
     cProfile.run("pt1([])")
     cProfile.run("pt2([])")

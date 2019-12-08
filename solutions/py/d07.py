@@ -68,3 +68,11 @@ def pt2(input):
             highest_signal = signal
             highest_sequence = phase_seq
     return (highest_sequence, highest_signal)
+
+if __name__ == "__main__":
+    import cProfile
+
+    input = open("../input/07", "r").readlines()
+    pt1(input)
+    cProfile.run("pt1(input)")
+    cProfile.run("pt2(input)")
