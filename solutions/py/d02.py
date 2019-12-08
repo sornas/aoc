@@ -37,7 +37,7 @@ def pt2(input):
                     memory[memory[pointer+3]] = memory[memory[pointer+1]] * memory[memory[pointer+2]]
                 pointer += 4
             if memory[0] == 19690720:
-                return (n, v)
+                return (n, v, n*100 + v)
 
 if __name__ == "__main__":
     import cProfile
