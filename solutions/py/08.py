@@ -15,14 +15,6 @@ for l in range(100):
     img.append(layer)
 print(1, n)
 
-
-def pretty(result):
-    for row in result:
-        for c in row:
-            print(('\u2588' if c == 1 else ' '), end='')
-        print("")
-
-
 result = img[0]
 for layer in img[1:]:
     for x in range(25):
@@ -30,4 +22,7 @@ for layer in img[1:]:
             if result[y][x] == 2:
                 result[y][x] = layer[y][x]
 print(2)
-pretty(result)
+for row in result:
+    for c in row:
+        print(('\u2588' if c == 1 else ' '), end='')
+    print("")
