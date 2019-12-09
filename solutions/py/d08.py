@@ -32,6 +32,7 @@ if __name__ == "__main__":
     import cProfile
 
     input = open("../input/08", "r").readlines()
-    pt1(input)
     cProfile.run("pt1(input)")
     cProfile.run("pt2(input)")
+    print(pt1(input))
+    print(pt2(input))

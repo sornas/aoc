@@ -47,3 +47,5 @@ if __name__ == "__main__":
 
     cProfile.run("pt1([])")
     cProfile.run("pt2([])")
+    print(pt1([]))
+    print(pt2([]))
