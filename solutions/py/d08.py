@@ -23,10 +23,10 @@ def pt2(input):
                     result[y][x] = layer[y][x]
     str_res = []
     for row in result:
+        str_res.append("\n  ")
         for c in row:
             str_res.append('\u2588' if c == 1 else ' ')
-        str_res.append("\n")
-    return "\n" + ("".join(str_res))
+    return "".join(str_res)
 
 if __name__ == "__main__":
     import cProfile
