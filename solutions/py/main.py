@@ -24,6 +24,13 @@ for mod, day in zip(mods, range(len(mods))):
     print("Part", 2, mod.pt2(open("../input/" + str(day+1).zfill(2), "r").readlines()))
     timings[day][1] = time.clock_gettime_ns(clock_type) - t0
 
+print()
+tot = 0
 for day in range(len(timings)):
     for part in range(2):
-        print("day", str(day+1).zfill(2), part+1, "  ", timings[day][part] / 1000000, "ms")
+        tot += timings[day][part]
+for day in range(len(timings)):
+    for part in range(2):
+        print("day {0}-{1}: {2:.2f}ms\t({3:.1f}%)".format(str(day+1).zfill(2), part+1, \
+            timings[day][part] / 1000000, 100*timings[day][part] / tot))
+print("sum", tot / 1000000, "ms")
