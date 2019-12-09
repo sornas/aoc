@@ -8,8 +8,9 @@ import d05
 import d06
 import d07
 import d08
+import d09
 
-mods = [d01, d02, d03, d04, d05, d06, d07, d08]
+mods = [d01, d02, d03, d04, d05, d06, d07, d08, d09]
 
 timings = [[0 for _ in range(2)] for _ in range(len(mods))]
 clock_type = time.CLOCK_MONOTONIC
