@@ -1,13 +1,17 @@
 from collections import Counter
 
 def isIncreasing(num):
-    s = str(num)
+    s = list(str(num))
     n = int(s[0])
+    n_i = 0
     for sp in s[1:]:
+        n_i += 1
         if int(sp) < n:
-            return False
+            for i in range(n_i, 6):
+                s[i] = str(n)
+            return False, int("".join(s))
         n = int(sp)
-    return True
+    return (True,)
 
 def pt1(input):
     def containsDouble(num):
@@ -19,10 +23,14 @@ def pt1(input):
         return c[0] + c[1] < 10
 
     amount = 0
-    for n in range(357253, 892942 + 1):
-        if isIncreasing(n):
+    n = 357253
+    while n < 892942 + 1:
+        if (inc := isIncreasing(n))[0] == True:
             if containsDouble(n):
                 amount += 1
+            n += 1
+        else:
+            n = inc[1]
     return amount
 
 def pt2(input):
@@ -36,10 +44,14 @@ def pt2(input):
             return c[2] >= 1
 
     amount = 0
-    for n in range(357253, 892942 + 1):
-        if isIncreasing(n):
+    n = 357253
+    while n < 892942 + 1:
+        if (inc := isIncreasing(n))[0] == True:
             if containsDouble(n):
                 amount += 1
+            n += 1
+        else:
+            n = inc[1]
     return amount
 
 if __name__ == "__main__":
