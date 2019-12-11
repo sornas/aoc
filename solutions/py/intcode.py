@@ -13,8 +13,9 @@ HAL = 99
 
 class Computer(object):
     def __init__(self, program):
-        self.memory = program.copy()
-        self.memory_size = len(self.memory)  # pointers greater than this go in extra memory
+        self.memory = {}
+        for i in range(len(program)):
+            self.memory[i] = program[i]
         self.pointer = 0
         self.phase_read = False  # for day 7
         self.relative_base = 0
@@ -35,16 +36,10 @@ class Computer(object):
         self.output = None
 
     def write(self, addr, val):
-        if addr > self.memory_size:
-            self.extra_mem[addr] = val
-        else:
-            self.memory[addr] = val
+        self.memory[addr] = val
 
     def get(self, addr):
-        if addr > self.memory_size:
-            return self.extra_mem[addr] if addr in self.extra_mem else 0
-        else:
-            return self.memory[addr]
+        return self.memory.get(addr, 0)
 
     def get_param(self, inst, num):
         if inst[num] == 0:
