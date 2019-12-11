@@ -19,9 +19,9 @@ def draw(colors, ship, direction):
         min_y = min(min_y, color[1])
         max_y = max(max_y, color[1])
     s = ""
-    for y in range(min_y-1, max_y+2):
+    for y in range(min_y, max_y+1):
         s += "\n"
-        for x in range(min_x-1, max_x+1):
+        for x in range(min_x, max_x+1):
             if (x,y) == ship:
                 s += ship_c
             elif (x,y) in colors:
