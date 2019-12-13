@@ -1,6 +1,5 @@
 import itertools
-import math
-f = open("../input/12", "r")
+import primefac
 
 class Moon(object):
     def __init__(self, x, y, z):
@@ -16,78 +15,131 @@ class Moon(object):
         self.y += self.dy
         self.z += self.dz
 
-    def gravity(self, other):
+    def gx(self, other):
         if self.x < other.x:
             self.dx += 1
             other.dx -= 1
+
+    def gy(self, other):
         if self.y < other.y:
             self.dy += 1
             other.dy -= 1
+
+    def gz(self, other):
         if self.z < other.z:
             self.dz += 1
             other.dz -= 1
 
+    def gravity(self, other):
+        self.gx(other)
+        self.gy(other)
+        self.gz(other)
+
+    def get_x(self):
+        return self.x, self.dx
+
+    def get_y(self):
+        return self.y, self.dy
+
+    def get_z(self):
+        return self.z, self.dz
+
     def get(self):
-        return (self.x, self.y, self.z)
+        return self.get_x, self.get_y, self.get_z
 
-moons = []
-for line in f.readlines():
-    dims = line.rstrip().split(",")
-    x = int(dims[0][3:])
-    y = int(dims[1][3:])
-    z = int(dims[2][3:-1])
-    print(x,y,z)
-    moons.append(Moon(x, y, z))
+def pt1(input):
+    moons = []
 
-for moon, c in zip(moons, ["i", "e", "g", "c"]):
-    moon.c = c
+    for line in input:
+        dims = line.rstrip().split(",")
+        x = int(dims[0][3:])
+        y = int(dims[1][3:])
+        z = int(dims[2][3:-1])
+        moons.append(Moon(x, y, z))
 
-old_pos = {}
+    for _ in range(1000):
+        for pair in itertools.permutations(moons, 2):
+            pair[0].gravity(pair[1])
+        for moon in moons:
+            moon.step()
 
-def draw(moons):
-    min_x = min_y = min_z = max_x = max_y = max_z = 0
-    pos = {}
+    tot = 0
     for moon in moons:
-        min_x = min(min_x, moon.x)
-        max_x = max(max_x, moon.x)
-        min_y = min(min_y, moon.y)
-        max_y = max(max_y, moon.y)
-        min_z = min(min_z, moon.z)
-        max_z = max(max_z, moon.z)
-        pos[(moon.x, moon.y)] = moon.c
+        pot = abs(moon.x) + abs(moon.y) + abs(moon.z)
+        kin = abs(moon.dx) + abs(moon.dy) + abs(moon.dz)
+        tot += pot*kin
+    return tot
 
-    for y in range(-20, 20):
-        for x in range(-20, 20):
-            b = False
-            if (x,y) in pos:
-                print(pos[(x,y)], end="")
-                continue
-            print(" ", end="")
-        print()
+def pt2(input):
+    moons = []
+    xs = 0
+    ys = 0
+    zs = 0
 
-# start
-# i = 0
-# while True:
-#     if i % 70000 == 0:
-#         print(i)
-#     old_pos[(moon.get() for moon in moons)] = i
-#     for pair in itertools.permutations(moons, 2):
-#         pair[0].gravity(pair[1])
-#     for moon in moons:
-#         moon.step()
-#     i += 1
-#     if (moon.get() for moon in moons) in old_pos:
-#         print("stop", i)
-#         break
-#
-for i in range(1000):
-    for pair in itertools.permutations(moons, 2):
-        pair[0].gravity(pair[1])
-    for moon in moons:
-        moon.step()
-tot = 0
-for moon in moons:
-    pot = abs(moon.x) + abs(moon.y) + abs(moon.z)
-    kin = abs(moon.dx) + abs(moon.dy) + abs(moon.dz)
-    tot += pot*kin
-print(tot)
+    for line in input:
+        dims = line.rstrip().split(",")
+        x = int(dims[0][3:])
+        y = int(dims[1][3:])
+        z = int(dims[2][3:-1])
+        moons.append(Moon(x, y, z))
+
+    # x
+    states = {}
+    i = -1
+    while 1:
+        i += 1
+        if tuple(moon.get_x() for moon in moons) in states:
+            xs = i
+            break
+        states[tuple(moon.get_x() for moon in moons)] = i
+        for pair in itertools.permutations(moons, 2):
+            pair[0].gx(pair[1])
+        for moon in moons:
+            moon.step()
+
+    # y
+    states = {}
+    i = -1
+    while 1:
+        i += 1
+        if tuple(moon.get_y() for moon in moons) in states:
+            ys = i
+            break
+        states[tuple(moon.get_y() for moon in moons)] = i
+        for pair in itertools.permutations(moons, 2):
+            pair[0].gy(pair[1])
+        for moon in moons:
+            moon.step()
+
+    # z
+    states = {}
+    i = -1
+    while 1:
+        i += 1
+        if tuple(moon.get_z() for moon in moons) in states:
+            zs = i
+            break
+        states[tuple(moon.get_z() for moon in moons)] = i
+        for pair in itertools.permutations(moons, 2):
+            pair[0].gz(pair[1])
+        for moon in moons:
+            moon.step()
+
+    factors = [primefac.factorint(n) for n in (xs, ys, zs)]
+    nums = {}
+    for factor in factors:
+        for n in factor:
+            nums[n] = max(nums.get(n, 0), factor[n])
+    ans = 1
+    for n in nums:
+        ans *= n ** nums[n]
+    return ans
+
+if __name__ == "__main__":
+    import cProfile
+
+    input = open("../input/12", "r").readlines()
+    cProfile.run("pt1(input)")
+    cProfile.run("pt2(input)")
+    print(pt1(input))
+    print(pt2(input))
