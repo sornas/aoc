@@ -23,6 +23,7 @@ class Computer(object):
 
         self.input = None
         self.output = None
+        self.wants_input = False
 
     def parse_op(self, op):
         #TODO
@@ -70,7 +71,11 @@ class Computer(object):
                     self.get_param(inst, 1) * self.get_param(inst, 2))
             self.pointer += 4
         elif inst[0] == IN:
+            if self.input is None:
+                self.wants_input = True
+                return
             self.write_param(inst, 1, self.input)
+            self.wants_input = False
             self.input = None
             self.pointer += 2
         elif inst[0] == OUT:
