@@ -105,7 +105,7 @@ def visualize(input):
 
     while c.memory[c.pointer] != 99:
         if c.wants_input:
-            time.sleep(0.005)
+            time.sleep(0.01)
             frame_n += 1
             frame, points, ball_x, paddle_x = draw(screen, points)
             print(frame)
@@ -127,9 +127,6 @@ if __name__ == "__main__":
     import cProfile
 
     _input = open("../input/13", "r").readlines()
-    cProfile.run("pt1(_input)")
-    cProfile.run("pt2(_input)")
     print(pt1(_input))
     print(pt2(_input))
-    if input("Visualize? [Y/n]: ") == "y":
-        visualize(_input)
+    #visualize(_input)
