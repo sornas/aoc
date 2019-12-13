@@ -13,13 +13,11 @@ HAL = 99
 
 class Computer(object):
     def __init__(self, program):
-        self.memory = {}
-        for i in range(len(program)):
-            self.memory[i] = program[i]
+        self.memory = program.copy()
+        self.instruction_cache = {}
         self.pointer = 0
         self.phase_read = False  # for day 7
         self.relative_base = 0
-        self.extra_mem = {}
 
         self.input = None
         self.output = None
@@ -27,9 +25,12 @@ class Computer(object):
 
     def parse_op(self, op):
         #TODO
+        if op in self.instruction_cache:
+            return self.instruction_cache[op]
         code = op % 100
         ops = str(op).zfill(param_amount[code]+2)
-        return [code] + [int(x) for x in ops[:-2][::-1]]
+        self.instruction_cache[op] = [code] + [int(x) for x in ops[:-2][::-1]]
+        return self.instruction_cache[op]
         #return [code] + [(op // 10**(i+2)) % 10**(i+1) for i in range(param_amount[code])]
 
     def clear_flags(self):
@@ -37,10 +38,14 @@ class Computer(object):
         self.output = None
 
     def write(self, addr, val):
+        while addr >= len(self.memory):
+            self.memory.append(0)
         self.memory[addr] = val
 
     def get(self, addr):
-        return self.memory.get(addr, 0)
+        while addr >= len(self.memory):
+            self.memory.append(0)
+        return self.memory[addr]
 
     def get_param(self, inst, num):
         if inst[num] == 0:
