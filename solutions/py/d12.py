@@ -70,6 +70,27 @@ def pt1(input):
         tot += pot*kin
     return tot
 
+def get_cycle(init_pos, init_vel):
+    initial = tuple(init_pos)
+    pos = init_pos.copy()
+    vel = init_vel.copy()
+    iters = 0
+    while 1:
+        for i, j in itertools.permutations(range(4), 2):
+            if i == j:
+                continue
+            if pos[i] < pos[j]:
+                vel[i] += 1
+                vel[j] -= 1
+        for i in range(4):
+            pos[i] += vel[i]
+        iters += 1
+        if pos[0] == initial[0] and pos[1] == initial[1] and \
+                pos[2] == initial[2] and pos[3] == initial[3] and \
+                vel[0] == 0 and vel[1] == 0 and \
+                vel[2] == 0 and vel[3] == 0:
+            return iters
+
 def pt2(input):
     moons = []
     xs = 0
@@ -83,47 +104,9 @@ def pt2(input):
         z = int(dims[2][3:-1])
         moons.append(Moon(x, y, z))
 
-    # x
-    states = {}
-    i = -1
-    while 1:
-        i += 1
-        if tuple(moon.get_x() for moon in moons) in states:
-            xs = i
-            break
-        states[tuple(moon.get_x() for moon in moons)] = i
-        for pair in itertools.permutations(moons, 2):
-            pair[0].gx(pair[1])
-        for moon in moons:
-            moon.step()
-
-    # y
-    states = {}
-    i = -1
-    while 1:
-        i += 1
-        if tuple(moon.get_y() for moon in moons) in states:
-            ys = i
-            break
-        states[tuple(moon.get_y() for moon in moons)] = i
-        for pair in itertools.permutations(moons, 2):
-            pair[0].gy(pair[1])
-        for moon in moons:
-            moon.step()
-
-    # z
-    states = {}
-    i = -1
-    while 1:
-        i += 1
-        if tuple(moon.get_z() for moon in moons) in states:
-            zs = i
-            break
-        states[tuple(moon.get_z() for moon in moons)] = i
-        for pair in itertools.permutations(moons, 2):
-            pair[0].gz(pair[1])
-        for moon in moons:
-            moon.step()
+    xs = get_cycle([moon.x for moon in moons], [0 for _ in range(4)])
+    ys = get_cycle([moon.y for moon in moons], [0 for _ in range(4)])
+    zs = get_cycle([moon.z for moon in moons], [0 for _ in range(4)])
 
     factors = [primefac.factorint(n) for n in (xs, ys, zs)]
     nums = {}
@@ -136,10 +119,6 @@ def pt2(input):
     return ans
 
 if __name__ == "__main__":
-    import cProfile
-
     input = open("../input/12", "r").readlines()
-    cProfile.run("pt1(input)")
-    cProfile.run("pt2(input)")
     print(pt1(input))
     print(pt2(input))
