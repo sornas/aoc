@@ -44,7 +44,7 @@ def pt2(input):
     ball_x = paddle_x = 0
 
     while c.memory[c.pointer] != 99:
-        if c.wants_input:
+        if c.SIG_INPUT:
             points, ball_x, paddle_x = draw(screen, points)
             if paddle_x < ball_x:
                 c.input = 1
@@ -104,7 +104,7 @@ def visualize(input):
     ball_x = paddle_x = 0
 
     while c.memory[c.pointer] != 99:
-        if c.wants_input:
+        if c.SIG_INPUT:
             time.sleep(0.01)
             frame_n += 1
             frame, points, ball_x, paddle_x = draw(screen, points)

@@ -14,6 +14,8 @@ HAL = 99
 class Computer(object):
     def __init__(self, program):
         self.memory = program.copy()
+        self.memory_size = len(self.memory)
+        self.extra_memory = {}
         self.instruction_cache = {}
         self.pointer = 0
         self.phase_read = False  # for day 7
@@ -21,10 +23,12 @@ class Computer(object):
 
         self.input = None
         self.output = None
-        self.wants_input = False
+
+        self.SIG_INPUT = False
+        self.SIG_OUTPUT = False
+        self.SIG_HALT = False
 
     def parse_op(self, op):
-        #TODO
         if op in self.instruction_cache:
             return self.instruction_cache[op]
         code = op % 100
@@ -38,13 +42,14 @@ class Computer(object):
         self.output = None
 
     def write(self, addr, val):
-        while addr >= len(self.memory):
-            self.memory.append(0)
-        self.memory[addr] = val
+        if addr >= self.memory_size:
+            self.extra_memory[addr] = val
+        else:
+            self.memory[addr] = val
 
     def get(self, addr):
-        while addr >= len(self.memory):
-            self.memory.append(0)
+        if addr >= self.memory_size:
+            return self.extra_memory.get(addr, 0)
         return self.memory[addr]
 
     def get_param(self, inst, num):
@@ -64,8 +69,12 @@ class Computer(object):
             self.write(self.relative_base + self.get(self.pointer + num), val)
 
     def step(self):
+        if self.SIG_OUTPUT and self.output is None:
+            self.SIG_OUTPUT = False
+
         inst = self.parse_op(self.memory[self.pointer])
         if inst[0] == HAL:
+            self.SIG_HALT = True
             return
         elif inst[0] == ADD:
             self.write_param(inst, 3, \
@@ -77,14 +86,18 @@ class Computer(object):
             self.pointer += 4
         elif inst[0] == IN:
             if self.input is None:
-                self.wants_input = True
+                self.SIG_INPUT = True
                 return
             self.write_param(inst, 1, self.input)
-            self.wants_input = False
             self.input = None
+            self.SIG_INPUT = False
             self.pointer += 2
         elif inst[0] == OUT:
+            if self.output is not None:
+                self.SIG_OUTPUT = True
+                return
             self.output = self.get_param(inst, 1)
+            self.SIG_OUTPUT = False
             self.pointer += 2
         elif inst[0] == JNZ:
             if self.get_param(inst, 1) != 0:
