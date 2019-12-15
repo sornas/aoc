@@ -93,11 +93,10 @@ class Computer(object):
             self.SIG_INPUT = False
             self.pointer += 2
         elif inst[0] == OUT:
-            if self.output is not None:
-                self.SIG_OUTPUT = True
+            if self.SIG_OUTPUT:
                 return
             self.output = self.get_param(inst, 1)
-            self.SIG_OUTPUT = False
+            self.SIG_OUTPUT = True
             self.pointer += 2
         elif inst[0] == JNZ:
             if self.get_param(inst, 1) != 0:
