@@ -18,64 +18,27 @@ def draw(board, droid=None, path=None, visited=None):
         for x in range(min_x-1, max_x+2):
             point = (x, y)
             if droid is not None and point == droid:
-                s += "D"*size
+                s += "D" * size
             elif path is not None and point in path:
-                s += "\u2591"*size
+                s += "\u2591" * size
             elif visited is not None and point in visited:
-                s += "."*size
+                s += "." * size
             elif point in board:
-                s += ("\u2588" if board[point] == "#" else " ")*size
+                if board[point] == "#":
+                    s += "\u2588" * size
+                elif board[point] == "S":
+                    s += "\u2591" * size
+                else:
+                    s += " " * size
             else:
-                s += "."*size
+                s += "." * size
     return s
 
-def dist(a, b):
-    return abs(a[0] - b[0]) + abs(a[1] -b[1])
-
 def neighbours(p):
-    ''' Return all neighbours to p in a tuple '''
     return [(p[0]+1, p[1]), (p[0]-1, p[1]), \
             (p[0], p[1]+1), (p[0], p[1]-1)]
 
-def get_path(p_start, p_end, board):
-    #print("get_path", p_start, p_end)
-    '''
-    Return a path as a deque between p_start and p_end given some board-state
-
-    The path is guaranteed valid but not guaranteed the shortest
-    '''
-    if p_start == p_end:
-        # already at destination, no path 
-        return collections.deque()
-    visited = set()
-    h = []
-    heap.heappush(h, (0, p_start, collections.deque()))
-    while True:
-        cur = heap.heappop(h)
-        for n in neighbours(cur[1]):
-            if n == p_end:
-                # done
-                cur[2].append(n)
-                return cur[2]
-            if n in visited:
-                continue
-            if n not in board:
-                # unknown point
-                continue
-            if board[n] == "#":
-                # wall
-                continue
-            new_path = collections.deque(cur[2])
-            new_path.append(n)
-            visited.add(n)
-            heap.heappush(h, (dist(p_start, n), n, new_path))
-
-def get_short_path(start, end, board):
-    '''
-    Return the shortest path between start and end given some board-state
-
-    The path is guaranteed valid and the shortest available
-    '''
+def get_path(start, end, board):
     if start == end:
         return collections.deque()
     visited = set()
@@ -172,7 +135,7 @@ while not c.SIG_HALT:
         elif c.output == 1:
             board[(cur_x, cur_y)] = "."
         elif c.output == 2:
-            board[(cur_x, cur_y)] = "O"
+            board[(cur_x, cur_y)] = "S"
             print("found oxygen at", (cur_x, cur_y))
             oxygen = (cur_x, cur_y)
         else:
@@ -183,6 +146,5 @@ while not c.SIG_HALT:
             print(draw(board, (cur_x, cur_y)))
 print(draw(board))
 print(draw(board, path=get_path((0,0), oxygen, board)))
-print(draw(board, path=get_short_path((0,0), oxygen, board)))
-print(len(get_short_path((0,0), oxygen, board)))
+print(len(get_path((0,0), oxygen, board)))
 print(steps)
