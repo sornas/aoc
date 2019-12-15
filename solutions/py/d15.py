@@ -1,7 +1,6 @@
 import intcode
 import heapq as heap
 import collections
-import queue
 import time
 
 size = 2
@@ -39,23 +38,32 @@ def neighbours(p):
             (p[0], p[1]+1), (p[0], p[1]-1)]
 
 def get_path(start, end, board):
+    #print("get_path", start, end)
     if start == end:
         return collections.deque()
     visited = set()
     h = []
     heap.heappush(h, (0, start, collections.deque()))
     while True:
+        #print("h", h)
         cur = heap.heappop(h)
         for n in neighbours(cur[1]):
+            #print("n", n)
             if n == end:
+                #print("done")
                 cur[2].append(n)
+                #print(cur[2])
                 return cur[2]
             if n in visited:
+                #print("visited")
                 continue
             if n not in board:
+                #print("not in board")
                 continue
             if board[n] == "#":
+                #print("wall")
                 continue
+            #print("adding")
             new_path = collections.deque(cur[2])
             new_path.append(n)
             visited.add(n)
@@ -64,10 +72,11 @@ def get_path(start, end, board):
             heap.heappush(h, (cur[0] + 1, n, new_path))
 
 cur_x = cur_y = 0
-stack = collections.deque()
-stack.append((0,0))
+q = collections.deque()
+q.append((0,0))
 path = collections.deque()
 board = {}
+board[(0,0)] = "."
 oxygen = (0,0)
 
 f = open("../input/15", "r").readlines()
@@ -76,8 +85,8 @@ c = intcode.Computer([int(x) for x in f[0].split(",")])
 auto = True
 steps = 0
 while not c.SIG_HALT:
-    if auto and len(stack) == 0:
-        print("stack empty")
+    if auto and len(q) == 0:
+        print("queue empty")
         break
     c.step()
     if c.SIG_INPUT:
@@ -87,9 +96,12 @@ while not c.SIG_HALT:
             if len(path) == 0:
                 # find new path
                 for n in neighbours((cur_x, cur_y)):
-                    if n not in stack and n not in board:
-                        stack.append(n)
-                next = stack.pop()
+                    if n not in q and n not in board:
+                        q.append(n)
+                if (cur_x, cur_y) in q:
+                    q.remove((cur_x, cur_y))
+                #print(q)
+                next = q.pop()
                 path = get_path((cur_x, cur_y), next, board)
             next_step = path.popleft()
             if next_step[1] == cur_y-1:
@@ -127,16 +139,18 @@ while not c.SIG_HALT:
         steps += 1
         c.SIG_INPUT = False
     if c.SIG_OUTPUT:
-        # time.sleep(0.075)
-        # print(draw(board, droid=(cur_x, cur_y)))
+        time.sleep(0.01)
+        print(draw(board, droid=(cur_x, cur_y)))
         if c.output == 0:
+            #print("found wall")
             board[(cur_x, cur_y)] = "#"
             cur_x, cur_y = prev_x, prev_y
         elif c.output == 1:
+            #print("found empty")
             board[(cur_x, cur_y)] = "."
         elif c.output == 2:
+            #print("found oxygen at", (cur_x, cur_y))
             board[(cur_x, cur_y)] = "S"
-            print("found oxygen at", (cur_x, cur_y))
             oxygen = (cur_x, cur_y)
         else:
             break
@@ -147,4 +161,21 @@ while not c.SIG_HALT:
 print(draw(board))
 print(draw(board, path=get_path((0,0), oxygen, board)))
 print(len(get_path((0,0), oxygen, board)))
+print(steps)
+
+steps = 0
+visited = set(oxygen)
+cur_layer = []
+next_layer = [oxygen]
+while True:
+    cur_layer = next_layer.copy()
+    next_layer = []
+    for p in cur_layer:
+        for n in neighbours(p):
+            if n in board and board[n] != "#" and n not in visited:
+                visited.add(n)
+                next_layer.append(n)
+    if len(next_layer) == 0:
+        break
+    steps += 1
 print(steps)
