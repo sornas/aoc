@@ -15,8 +15,10 @@ import d12
 import d13
 import d14
 import d15
+import d16
 
-mods = [d01, d02, d03, d04, d05, d06, d07, d08, d09, d10, d11, d12, d13, d14, d15]
+mods = [d01, d02, d03, d04, d05, d06, d07, d08, d09, d10, d11, d12, d13, \
+        d14, d15, d16]
 
 timings = [[0 for _ in range(2)] for _ in range(len(mods))]
 clock_type = time.CLOCK_MONOTONIC

@@ -1,7 +1,3 @@
-from profilehooks import coverage
-from profilehooks import profile
-
-#@coverage
 def do(input, phases=100, repeats=1):
     nums = []
     for i in range(repeats):
@@ -59,13 +55,12 @@ def square(size):
         s += "\n"
     return s
 
-input = open("../input/16", "r").readlines()
-ans1 = pt1(input)
-ans2 = pt2(input)
-print(ans1)
-print(ans2)
-#print(do(["80871224585914546619083218645595"]))
-#print()
-#print(square(8))
-#print(square(20))
-#print(square(62))
+if __name__ == "__main__":
+    input = open("../input/16", "r").readlines()
+    ans1 = pt1(input)
+    ans2 = pt2(input)
+    print(ans1)
+    print(ans2)
+    #print(square(8))
+    #print(square(20))
+    #print(square(62))
