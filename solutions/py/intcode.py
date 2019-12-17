@@ -87,6 +87,8 @@ class Computer(object):
     def step(self):
         if self.SIG_OUTPUT and self.output is None:
             self.SIG_OUTPUT = False
+        if self.SIG_INPUT and self.input is not None:
+            self.SIG_INPUT = False
 
         inst = self.parse_op(self.memory[self.pointer])
         if inst[0] == HAL:

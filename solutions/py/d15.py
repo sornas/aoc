@@ -134,7 +134,6 @@ def pt2(input):
                 print("invalid path")
                 break
             c.input = direction
-            c.SIG_INPUT = False
         if c.SIG_OUTPUT:
             if c.output == 0:
                 board[(cur_x, cur_y)] = "#"
@@ -147,7 +146,6 @@ def pt2(input):
             else:
                 break
             c.output = None
-            c.SIG_OUTPUT = False
 
     steps = 0
     visited = set(oxygen)
@@ -238,7 +236,6 @@ def visualize(input):
                 print("invalid path")
                 break
             c.input = direction
-            c.SIG_INPUT = False
         if c.SIG_OUTPUT:
             if c.output == 0:
                 board[(cur_x, cur_y)] = "#"
@@ -253,7 +250,6 @@ def visualize(input):
             time.sleep(0.005)
             print(draw(board, droid=(cur_x, cur_y)))
             c.output = None
-            c.SIG_OUTPUT = False
 
     get_path((0,0), oxygen, board, draw_search=True)
 
