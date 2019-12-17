@@ -4,7 +4,7 @@ def do(input, phases=100, repeats=1):
         nums += [int(x) for x in input[0].strip()]
 
     for phase in range(phases):
-        print(phase)
+        #print(phase)
         new_list = []
         for i in range(len(nums)):  # position of number to calculate
             new_num = 0
@@ -28,7 +28,7 @@ def pt2(input, phases=100, repeats=10000):
         nums += [int(x) for x in input[0].strip()]
     nums = nums[offset:]
     for phase in range(phases):
-        print(phase)
+        #print(phase)
         nums = nums[::-1]
         new_nums = []
         n = sum(nums)
@@ -38,29 +38,9 @@ def pt2(input, phases=100, repeats=10000):
         nums = new_nums
     return "".join([str(n) for n in nums[:8]])
 
-def square(size):
-    s = ""
-    for y in range(size):
-        for x in range(size):
-            mod = (x+1) % (4*(y+1))
-            if mod < y+1:
-                s += "0"
-            elif mod < 2*y + 2:
-                s += "+"
-            elif mod < 3*y + 3:
-                s += "0"
-            else:
-                s += "-"
-            s += " "
-        s += "\n"
-    return s
-
 if __name__ == "__main__":
     input = open("../input/16", "r").readlines()
     ans1 = pt1(input)
     ans2 = pt2(input)
     print(ans1)
     print(ans2)
-    #print(square(8))
-    #print(square(20))
-    #print(square(62))
