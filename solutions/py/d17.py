@@ -185,51 +185,79 @@ For example:
 current = None
 direction = 2
 paths = deque()
-paths.append((robot, direction, [], ["L", 0], set()))
+visited = set()
+visited.add(robot)
+paths.append((robot, direction, [], ["L", 0], visited))
 while True:
-    #print("considering", len(paths), "paths")
     if current is None:
-        #print("popping")
         current = paths.popleft()
-        #print("now", current)
         robot = current[0]
         direction = current[1]
         instruction_set = current[2]
         wip_instruction = current[3]
-        visited = current[4]
+        visited = current[4].copy()
         if len(visited) == len(scaffolds):
             print("len(visited) == len(scaffolds)")
             instruction_set.append(wip_instruction)
-            print(instruction_set)
             break
-
     if get_infront(robot, direction) not in scaffolds:
-        #print("wall")
         # wall in front. save
         instruction_set.append(wip_instruction)
         avail_points = get_turnable_points(scaffolds, robot, direction)
-        if len(avail_points) != 1:
-            print("len(avail_direction != 2")
-            print(instruction_set)
-            break
+        if len(avail_points) == 0:
+            if len(visited) == len(scaffolds):
+                break
+            else:
+                current = None
+                continue
         wip_instruction = [get_turn(robot, direction, avail_points[0]), 0]
         direction = get_direction(direction, get_turn(robot, direction, avail_points[0]))
         paths.append((robot, direction, instruction_set, wip_instruction, visited))
-        #print("appended. now", paths)
         current = None
     else:  # wall not in front
         '''
-        if robot in intersections:
+        if robot in intersections and wip_instruction[1] != 0:
             # queue intersections
             new_instruction_set = instruction_set.copy()
-            new_instruction_set.append(wip_instruction)
+            new_instruction_set.append(wip_instruction.copy())
             paths.append((robot, get_direction(direction, "L"), \
-                    new_instruction_set, ["L", 0], visited))
+                    new_instruction_set.copy(), ["L", 0], visited))
             paths.append((robot, get_direction(direction, "R"), \
-                    new_instruction_set, ["R", 0], visited))
-        '''
+                    new_instruction_set.copy(), ["R", 0], visited))
+                    '''
         # take step
         robot = get_infront(robot, direction)
-        #print("stepped", robot)
         visited.add(robot)
         wip_instruction[1] += 1
+
+print(instruction_set)
+s = ""
+for instruction in instruction_set:
+    s += str(instruction[0]) + "," + str(instruction[1]) + "\n"
+print(s)
+
+main_routine = "A,A,B,C,C,A,C,B,C,B"
+routine_a = "L,4,L,4,L,6,R,10,L,6"
+routine_b = "L,12,L,6,R,10,L,6"
+routine_c = "R,8,R,10,L,6"
+
+msg = deque()
+for s in [main_routine, routine_a, routine_b, routine_c]:
+    for ch in s:
+        msg.append(ord(ch))
+    msg.append(10)
+msg.append(ord("n"))
+msg.append(10)
+print(msg)
+
+c.reset()
+c.memory[0] = 2
+while not c.SIG_HALT:
+    c.step()
+    if c.SIG_INPUT:
+        c.input = msg.popleft()
+        c.SIG_INPUT = False
+    if c.SIG_OUTPUT:
+        print(c.output)
+        c.output = None
+        c.SIG_OUTPUT = False

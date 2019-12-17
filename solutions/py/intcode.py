@@ -13,8 +13,9 @@ HAL = 99
 
 class Computer(object):
     def __init__(self, program):
-        self.memory = program.copy()
-        self.memory_size = len(self.memory)
+        self.program = program
+        self.memory = self.program.copy()
+        self.memory_size = len(self.program)
         self.extra_memory = {}
         self.instruction_cache = {}
         self.pointer = 0
@@ -23,6 +24,21 @@ class Computer(object):
 
         self.input = None
         self.output = None
+
+        self.SIG_INPUT = False
+        self.SIG_OUTPUT = False
+        self.SIG_HALT = False
+
+    def reset(self):
+        self.memory = self.program.copy()
+        self.extra_memory = {}
+        self.instruction_cache = {}
+        self.pointer = 0
+        self.phase_read = False  # for day 7
+        self.relative_base = 0
+
+        self.input = None
+        self.ouput = None
 
         self.SIG_INPUT = False
         self.SIG_OUTPUT = False
