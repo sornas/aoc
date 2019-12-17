@@ -282,29 +282,17 @@ def pt2(input):
         s += str(instruction[0]) + "," + str(instruction[1]) + "\n"
     #print(s)
 
-    # hard-coded >:(
-    main_routine = "A,A,B,C,C,A,C,B,C,B"
-    routine_a = "L,4,L,4,L,6,R,10,L,6"
-    routine_b = "L,12,L,6,R,10,L,6"
-    routine_c = "R,8,R,10,L,6"
-
-    msg = deque()
-    for s in [main_routine, routine_a, routine_b, routine_c]:
-        for ch in s:
-            msg.append(ord(ch))
-        msg.append(10)
-    msg.append(ord("n"))
-    msg.append(10)
-    #print(msg)
-
     c.reset()
     c.memory[0] = 2
+    c.queue_ascii("A,A,B,C,C,A,C,B,C,B")
+    c.queue_ascii("L,4,L,4,L,6,R,10,L,6")
+    c.queue_ascii("L,12,L,6,R,10,L,6")
+    c.queue_ascii("R,8,R,10,L,6")
+    c.queue_ascii("n")
+    c.SIG_ASCII = True
     output = []
     while not c.SIG_HALT:
         c.step()
-        if c.SIG_INPUT:
-            c.input = msg.popleft()
-            c.SIG_INPUT = False
         if c.SIG_OUTPUT:
             output.append(c.output)
             c.output = None

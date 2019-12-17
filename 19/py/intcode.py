@@ -1,7 +1,8 @@
+from collections import deque
 param_amount = {1:3, 2:3, 3:1, 4:1, 5:2, 6:2, 7:3, 8:3, 9:1, 99:0}
 
 ADD = 1
-MULT = 2
+MUL = 2
 IN = 3
 OUT = 4
 JNZ = 5
@@ -14,20 +15,9 @@ HAL = 99
 class Computer(object):
     def __init__(self, program):
         self.program = program
-        self.memory = self.program.copy()
         self.memory_size = len(self.program)
-        self.extra_memory = {}
-        self.instruction_cache = {}
-        self.pointer = 0
-        self.phase_read = False  # for day 7
-        self.relative_base = 0
 
-        self.input = None
-        self.output = None
-
-        self.SIG_INPUT = False
-        self.SIG_OUTPUT = False
-        self.SIG_HALT = False
+        self.reset()
 
     def reset(self):
         self.memory = self.program.copy()
@@ -38,15 +28,17 @@ class Computer(object):
         self.relative_base = 0
 
         self.input = None
-        self.ouput = None
+        self.input_queue = deque()
+        self.output = None
 
         self.SIG_INPUT = False
+        self.SIG_ASCII = False
         self.SIG_OUTPUT = False
         self.SIG_HALT = False
 
     def parse_op(self, op):
-        if op in self.instruction_cache:
-            return self.instruction_cache[op]
+        # if op in self.instruction_cache:
+        #     return self.instruction_cache[op]
         code = op % 100
         ops = str(op).zfill(param_amount[code]+2)
         self.instruction_cache[op] = [code] + [int(x) for x in ops[:-2][::-1]]
@@ -84,6 +76,19 @@ class Computer(object):
         elif inst[num] == 2:
             self.write(self.relative_base + self.get(self.pointer + num), val)
 
+    def queue_input(self, data: list):
+        for val in data:
+            self.input_queue.append(data)
+
+    def queue_ascii(self, data: str, newline=True):
+        for c in data:
+            if c == "\n":
+                self.input_queue.append(10)
+            else:
+                self.input_queue.append(ord(c))
+        if newline:
+            self.input_queue.append(10)
+
     def step(self):
         if self.SIG_OUTPUT and self.output is None:
             self.SIG_OUTPUT = False
@@ -98,11 +103,13 @@ class Computer(object):
             self.write_param(inst, 3, \
                     self.get_param(inst, 1) + self.get_param(inst, 2))
             self.pointer += 4
-        elif inst[0] == MULT:
+        elif inst[0] == MUL:
             self.write_param(inst, 3, \
                     self.get_param(inst, 1) * self.get_param(inst, 2))
             self.pointer += 4
         elif inst[0] == IN:
+            if self.SIG_ASCII and len(self.input_queue) != 0:
+                self.input = self.input_queue.popleft()
             if self.input is None:
                 self.SIG_INPUT = True
                 return

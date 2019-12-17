@@ -1,3 +1,4 @@
+from profilehooks import coverage
 import math
 
 def intersection(l1, l2):
@@ -8,6 +9,7 @@ def intersection(l1, l2):
 def man_dist(point):
     return abs(point[0]) + abs(point[1])
 
+#@coverage
 def pt1(input):
     wire1 = []
     wire2 = []
@@ -39,6 +41,7 @@ def pt1(input):
         dist = min(dist, man_dist(point))
     return dist
 
+#@coverage
 def pt2(input):
     wire1 = {}
     wire2 = {}
@@ -75,10 +78,6 @@ def pt2(input):
     return length
 
 if __name__ == "__main__":
-    import cProfile
-
     input = open("../input/03", "r").readlines()
-    cProfile.run("pt1(input)")
-    cProfile.run("pt2(input)")
     print(pt1(input))
     print(pt2(input))
