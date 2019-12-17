@@ -250,7 +250,7 @@ def visualize(input):
                 oxygen = (cur_x, cur_y)
             else:
                 break
-            time.sleep(0.0075)
+            time.sleep(0.005)
             print(draw(board, droid=(cur_x, cur_y)))
             c.output = None
             c.SIG_OUTPUT = False

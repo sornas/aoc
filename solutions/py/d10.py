@@ -63,7 +63,8 @@ def pt1(input):
 
     best = [0, 0, 0]
     for coord in res:
-        if (amount := len(res[coord])) > best[0]:
+        amount = len(res[coord])
+        if amount > best[0]:
             best = [amount, coord, res[coord]]
     return (best[1], best[0])
 
@@ -106,7 +107,8 @@ def pt2(input):
 
     best = [0, 0, 0]
     for coord in res:
-        if (amount := len(res[coord])) > best[0]:
+        amount = len(res[coord])
+        if amount > best[0]:
             best = [amount, coord, res[coord]]
     asteroids.remove(best[1])
     x0 = best[1][0]
@@ -207,7 +209,8 @@ def visualize(input):
 
     best = [0, 0, 0]
     for coord in res:
-        if (amount := len(res[coord])) > best[0]:
+        amount = len(res[coord])
+        if amount > best[0]:
             best = [amount, coord, res[coord]]
     asteroids.remove(best[1])
     x0 = best[1][0]

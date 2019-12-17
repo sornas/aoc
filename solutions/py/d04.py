@@ -25,7 +25,8 @@ def pt1(input):
     amount = 0
     n = 357253
     while n < 892942 + 1:
-        if (inc := isIncreasing(n))[0] == True:
+        inc = isIncreasing(n)
+        if inc[0] == True:
             if containsDouble(n):
                 amount += 1
             n += 1
@@ -46,7 +47,8 @@ def pt2(input):
     amount = 0
     n = 357253
     while n < 892942 + 1:
-        if (inc := isIncreasing(n))[0] == True:
+        inc = isIncreasing(n)
+        if inc[0] == True:
             if containsDouble(n):
                 amount += 1
             n += 1
