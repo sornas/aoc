@@ -1,5 +1,5 @@
 import itertools
-import primefac
+#import primefac
 
 class Moon(object):
     def __init__(self, x, y, z):
@@ -48,6 +48,7 @@ class Moon(object):
         return self.get_x, self.get_y, self.get_z
 
 def pt1(input):
+    return
     moons = []
 
     for line in input:
@@ -92,6 +93,7 @@ def get_cycle(init_pos, init_vel):
             return iters
 
 def pt2(input):
+    return
     moons = []
     xs = 0
     ys = 0
