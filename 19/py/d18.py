@@ -235,9 +235,9 @@ while True:
 
     neighbours = graph[last]
     for n in neighbours:
-        #TODO recognize cycles
-        #if n[0] in visited:
-        #    continue
+        #TODO check if current state has been reached before and skip if it has
+
+        # a state is (not really) a set of keys collected (:frozenset) and the current square
         if n[0].isupper() and n[0] not in unlocked:
             continue
         visited = visited.copy()
