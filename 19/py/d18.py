@@ -220,6 +220,7 @@ for path, dist in start_paths.items():
 
 m = 0
 while True:
+    print(cur)
     cur = heap.heappop(h)
     dist = cur[0]
     last = cur[1]
@@ -234,8 +235,9 @@ while True:
 
     neighbours = graph[last]
     for n in neighbours:
-        if n[0] in visited:
-            continue
+        #TODO recognize cycles
+        #if n[0] in visited:
+        #    continue
         if n[0].isupper() and n[0] not in unlocked:
             continue
         visited = visited.copy()
