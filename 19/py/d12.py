@@ -1,5 +1,5 @@
 import itertools
-#import primefac
+import math
 
 class Moon(object):
     def __init__(self, x, y, z):
@@ -47,8 +47,10 @@ class Moon(object):
     def get(self):
         return self.get_x, self.get_y, self.get_z
 
+def lcm(a, b):
+    return a*b // math.gcd(a, b)
+
 def pt1(input):
-    return
     moons = []
 
     for line in input:
@@ -93,7 +95,6 @@ def get_cycle(init_pos, init_vel):
             return iters
 
 def pt2(input):
-    return
     moons = []
     xs = 0
     ys = 0
@@ -110,15 +111,7 @@ def pt2(input):
     ys = get_cycle([moon.y for moon in moons], [0 for _ in range(4)])
     zs = get_cycle([moon.z for moon in moons], [0 for _ in range(4)])
 
-    factors = [primefac.factorint(n) for n in (xs, ys, zs)]
-    nums = {}
-    for factor in factors:
-        for n in factor:
-            nums[n] = max(nums.get(n, 0), factor[n])
-    ans = 1
-    for n in nums:
-        ans *= n ** nums[n]
-    return ans
+    return lcm(lcm(xs, ys), zs)
 
 if __name__ == "__main__":
     input = open("../input/12", "r").readlines()
