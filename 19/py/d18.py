@@ -1,102 +1,9 @@
-import time
 import collections
 import heapq as heap
-import sys
-
-f = open("../input/18", "r").readlines()
 
 def neighbours(p):
     return [(p[0]+1, p[1]), (p[0]-1, p[1]), \
             (p[0], p[1]+1), (p[0], p[1]-1)]
-
-def path(start: tuple, end:tuple, board:dict, keys={}, doors={}, draw_search=False):
-    ''' Find the shortest path between two points '''
-    if start == end:
-        return collections.deque()
-    visited = set()
-    h = []
-    heap.heappush(h, (0, start, collections.deque()))
-    while True:
-        if len(h) == 0:
-            print(visited)
-            return
-        cur = heap.heappop(h)
-        for n in neighbours(cur[1]):
-            if n == end:
-                cur[2].append(n)
-                if draw_search:
-                    print(draw(board, path=cur[2], visited=visited))
-                return cur[2]
-            if n in visited or n not in board or board[n] == "#":
-                continue
-            if n in keys or n in doors:
-                continue
-            new_path = collections.deque(cur[2])
-            new_path.append(n)
-            visited.add(n)
-            heap.heappush(h, (cur[0] + 1, n, new_path))
-            if draw_search:
-                time.sleep(0.0075)
-                print(draw(board, keys=keys, doors=doors, path=new_path, visited=visited))
-                print(end)
-                print(n)
-
-def avail_keys(map: dict, pos: tuple, keys: dict, visited_keys: set, doors: dict, dead=set(), draw_search=False) -> list:
-    ''' Return a list of tuples consisting of ( dist, pos ) '''
-    visited = set()
-    avail = []
-    q = collections.deque()
-    q.append((0, pos))
-    while len(q) != 0:
-        cur = q.popleft()
-        if cur[1] in keys and keys[cur[1]] not in visited_keys:
-            avail.append(cur)
-            continue
-        for n in neighbours(cur[1]):
-            if n in map and map[n] == "#":
-                continue
-            if n in dead:
-                continue
-            if n in doors and doors[n].lower() not in visited_keys:
-                continue
-            if n in visited:
-                continue
-            visited.add(n)
-            q.append((cur[0]+1, n))
-            if draw_search:
-                print(draw(map, keys=keys, doors=doors, visited=visited, dead=dead))
-                print(visited_keys)
-                time.sleep(0.01)
-    return avail
-
-def avail_keys_doors(map: dict, pos: tuple, keys: dict, doors: dict, dead=set(), draw_search=False) -> list:
-    ''' Return a list of tuples consisting of ( dist, pos ) '''
-    visited = set()
-    avail = []
-    q = collections.deque()
-    q.append((0, pos))
-    while len(q) != 0:
-        cur = q.popleft()
-        if cur[1] in keys and cur[1] != pos:
-            avail.append((cur[0], cur[1], keys[cur[1]]))
-            continue
-        if cur[1] in doors and cur[1] != pos:
-            avail.append((cur[0], cur[1], doors[cur[1]]))
-            continue
-        for n in neighbours(cur[1]):
-            if n in map and map[n] == "#":
-                continue
-            if n in dead:
-                continue
-            if n in visited:
-                continue
-            visited.add(n)
-            q.append((cur[0]+1, n))
-            if draw_search:
-                print(draw(map, keys=keys, doors=doors, visited=visited, dead=dead))
-                print(visited_keys)
-                time.sleep(0.01)
-    return avail
 
 def draw(map, pos=None, keys={}, doors={}, path={}, visited={}, dead=set()) -> str:
     min_x=max_x=min_y=max_y = 0
@@ -131,118 +38,170 @@ def draw(map, pos=None, keys={}, doors={}, path={}, visited={}, dead=set()) -> s
                 s += "."
     return s
 
-def pos(s, keys, doors):
-    for iter in (keys, doors):
-        for k, v in keys.items():
-            if s == v:
-                return k
+def path(start: tuple, end:tuple, board:dict, keys={}, doors={}, draw_search=False):
+    ''' Find the shortest path between two points '''
+    if start == end:
+        return collections.deque()
+    visited = set()
+    h = []
+    heap.heappush(h, (0, start, collections.deque()))
+    while True:
+        if len(h) == 0:
+            print(visited)
+            return
+        cur = heap.heappop(h)
+        for n in neighbours(cur[1]):
+            if n == end:
+                cur[2].append(n)
+                if draw_search:
+                    print(draw(board, path=cur[2], visited=visited))
+                return cur[2]
+            if n in visited or n not in board or board[n] == "#":
+                continue
+            if n in keys or n in doors:
+                continue
+            new_path = collections.deque(cur[2])
+            new_path.append(n)
+            visited.add(n)
+            heap.heappush(h, (cur[0] + 1, n, new_path))
+            if draw_search:
+                time.sleep(0.0075)
+                print(draw(board, keys=keys, doors=doors, path=new_path, visited=visited))
+                print(end)
+                print(n)
 
-walls = set()
-walkables = set()
+def avail(map, start, items, dead):
+    visited = set()
+    avail = []
+    q = collections.deque()
+    q.append((0, start))
+    while len(q) > 0:
+        cur = q.popleft()
+        dist = cur[0]
+        pos = cur[1]
+        if pos in items and pos != start:
+            avail.append((dist, pos, items[pos]))
+            continue
+        for n in neighbours(pos):
+            if n in map and map[n] == "#":
+                continue
+            if n in dead:
+                continue
+            if n in visited:
+                continue
+            visited.add(n)
+            q.append((dist+1, n))
+    return avail
+
+def seen_before(keys, paths):
+    for path in paths:
+        if set(keys) == set(path) and keys[-1] == path[-1]:
+            return True
+    return False
+
+input = open("../input/18", "r").readlines()
+
 map = {}
-dead = set()  # dead ends, tiles which are effectivly walls
-keys = {}
-doors = {}
-keys_doors = {}
-for y in range(len(f)):
-    for x in range(len(f[y].strip())):
-        if f[y][x] == "@":
-            start = (x,y)
-            map[(x,y)] = "."
-        elif f[y][x].isalpha():
-            if f[y][x].isupper():
-                doors[(x,y)] = f[y][x]
-                keys_doors[(x,y)] = f[y][x]
-            else:
-                keys[(x,y)] = f[y][x]
-                keys_doors[(x,y)] = f[y][x]
-            map[(x,y)] = "?"
-        elif f[y][x] == "#":
-            map[(x,y)] = "#"
-            walls.add((x,y))
-        elif f[y][x] == ".":
-            map[(x,y)] = "."
-            walkables.add((x,y))
+map_keys = {}
+map_doors = {}
+map_keys_doors = {}
+walls = set()
+tiles = set()
 
+for y in range(len(input)):
+    for x in range(len(input[y].strip())):
+        c = input[y][x]
+        p = (x,y)
+        if c == "@":
+            start = p
+            map[p] = "."
+        elif c.isalpha():
+            if c.isupper():
+                map_doors[p] = c
+            else:
+                map_keys[p] = c
+            map[p] = "."
+        elif c == "#":
+            walls.add(p)
+            map[p] = c
+        elif c == ".":
+            tiles.add(p)
+            map[p] = c
+map_keys_doors.update(map_keys)
+map_keys_doors.update(map_doors)
+
+dead = set()
 for _ in range(10):
     ends = set()
     intersections = set()
-    for tile in walkables:
+    for tile in tiles:
         num_walls = 0
         for n in neighbours(tile):
             if n in walls or n in dead:
                 num_walls += 1
         if num_walls == 3:
             ends.add(tile)
-        if num_walls < 2:
+        elif num_walls < 2:
             intersections.add(tile)
-
+    
     for end in ends:
         cur = end
-        while cur not in intersections and cur not in keys and cur not in doors:
-            # is normal point
+        while cur not in intersections and cur not in map_keys and cur not in map_doors:
             dead.add(cur)
-            if cur in walkables:
-                walkables.remove(cur)
+            if cur in tiles:
+                tiles.remove(cur)
             for n in neighbours(cur):
                 if n not in walls and n not in dead:
                     cur = n
                     break
+paths = {}  # every path available between a door and a key
+start_paths = {}  # every path available from the starting point
 
-paths = {}
-start_paths = {}
+graph = {}  # {node: [children as tuples with name and distance]}
+for ent, s in map_keys_doors.items():
+    for a in avail(map, ent, map_keys_doors, dead):
+        paths[(s, a[2])] = a[0]
+        graph[s] = graph.get(s, []) + [(a[2], a[0])]
+for a in avail(map, start, map_keys, dead):
+    start_paths[("@", map_keys[a[1]])] = a[0]
 
-# GRAPH: {node: [children as tuples with name and distance]}
-graph = {}
-
-for ent, s in keys_doors.items():
-    for avail in avail_keys_doors(map, ent, keys, doors, draw_search=False):
-        paths[(s, avail[2])] = avail[0]
-        graph[s] = graph.get(s, []) + [(avail[2], avail[0])]
-used = set()
-for path in paths:
-    if (path[1], path[0]) in used:
-        continue
-    print(path[0],"--",path[1])
-    used.add((path[0], path[1]))
-for avail in avail_keys(map, start, keys, set(), doors):
-    start_paths[("@", keys[avail[1]])] = avail[0]
-    print("start", "->", keys[avail[1]])
-
-print(graph)
 h = []
 
 for path, dist in start_paths.items():
-    visited = []
+    cur = path[1]
+    keys = [path[1]]
     unlocked = set()
-    visited.append(path[1])
-    heap.heappush(h, (dist, path[1], visited, unlocked))
+    unlocked.add(cur.upper())
+    heap.heappush(h, (dist, cur, keys, unlocked))
 
 m = 0
+seen = []
+
 while True:
-    print(cur)
-    cur = heap.heappop(h)
-    dist = cur[0]
-    last = cur[1]
-    visited = cur[2]
-    unlocked = cur[3]
+    print(len(h))
+    candidate = heap.heappop(h)
+    dist = candidate[0]
+    cur = candidate[1]
+    keys = candidate[2]
+    unlocked = candidate[3]
+
+    # if seen_before
+    if seen_before(keys, seen):
+        continue
+    seen.append(keys)
 
     if len(unlocked) > m:
         m = len(unlocked)
-        print(m, visited)
-        if len(unlocked) == len(keys):
+        print(m, keys)
+        if len(unlocked) == len(map_doors):
             break
-
-    neighbours = graph[last]
-    for n in neighbours:
-        #TODO check if current state has been reached before and skip if it has
-
-        # a state is (not really) a set of keys collected (:frozenset) and the current square
+    
+    for n in graph[cur]:
         if n[0].isupper() and n[0] not in unlocked:
             continue
-        visited = visited.copy()
+        keys = keys.copy()
         unlocked = unlocked.copy()
-        visited.append(n[0])
         if n[0].islower():
+            keys.append(n[0])
             unlocked.add(n[0].upper())
-        heap.heappush(h, (dist+n[1], n[0], visited.copy(), unlocked.copy()))
+        heap.heappush(h, (dist+n[1], n[0], keys, unlocked))
