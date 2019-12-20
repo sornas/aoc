@@ -16,13 +16,13 @@ class Computer(object):
     def __init__(self, program):
         self.program = program
         self.memory_size = len(self.program)
+        self.instruction_cache = {}
 
         self.reset()
 
     def reset(self):
         self.memory = self.program.copy()
         self.extra_memory = {}
-        self.instruction_cache = {}
         self.pointer = 0
         self.phase_read = False  # for day 7
         self.relative_base = 0
@@ -37,8 +37,8 @@ class Computer(object):
         self.SIG_HALT = False
 
     def parse_op(self, op):
-        # if op in self.instruction_cache:
-        #     return self.instruction_cache[op]
+        if op in self.instruction_cache:
+            return self.instruction_cache[op]
         code = op % 100
         ops = str(op).zfill(param_amount[code]+2)
         self.instruction_cache[op] = [code] + [int(x) for x in ops[:-2][::-1]]
