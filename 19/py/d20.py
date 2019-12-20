@@ -121,29 +121,48 @@ for y in range(len(input)):
                 print(draw(maze, around=p))
                 sys.exit()
             alone_portals[portal] = location
-print(draw(maze, start=start, end=end, portals=portal_pairs))
+#print(draw(maze, start=start, end=end, portals=portal_pairs))
+
+INSIDE_X_LO = 20
+INSIDE_X_HI = 120
+INSIDE_Y_LO = 20
+INSIDE_Y_HI = 100
 
 # find shortest path between each portal (and start/end)
 h = []
-visited = set()
-visited.add(start)
-heap.heappush(h, (0, start))
+visited = {0: set()}
+visited[0].add(start)
+heap.heappush(h, (0, 0, start))
 while len(h) > 0:
     #print(draw(maze, start=start, end=end, portals=portal_pairs, visited=visited))
     cur = heap.heappop(h)
+    #print(len(h), cur)
     dist = cur[0]
-    point = cur[1]
-    if point == end:
+    dimen = cur[1]
+    point = cur[2]
+    x = point[0]
+    y = point[1]
+    if point == end and dimen == 0:
         print(dist)
         break
     if point in portal_pairs:
-        point = portal_pairs[point]
+        if x > INSIDE_X_LO and x < INSIDE_X_HI and \
+                y > INSIDE_Y_LO and y < INSIDE_Y_HI:
+            # inside donut
+            dimen += 1
+        else:
+            if dimen == 0:
+                continue
+            dimen -= 1
         dist += 1
+        if dimen not in visited:
+            visited[dimen] = set()
+        point = portal_pairs[point]
     for n in neighbours(point):
         if n not in maze:
             continue
-        if n in visited:
+        if n in visited[dimen]:
             continue
         if n not in walls:
-            visited.add(n)
-            heap.heappush(h, (dist+1, n))
+            visited[dimen].add(n)
+            heap.heappush(h, (dist+1, dimen, n))
