@@ -32,7 +32,18 @@ def deploy(c, x, y):
             break
     return c.output
 
-def do(input):
+def pt1(input):
+    c = intcode.Computer([int(x) for x in input[0].split(",")])
+
+    amount = 0
+    for y in range(0, 50):
+        for x in range(0, 50):
+            if deploy(c, x, y) == 1:
+                amount += 1
+    return amount
+
+def pt2(input):
+    print("this works but takes a while")
     amount = 0
     c = intcode.Computer([int(x) for x in input[0].split(",")])
 
@@ -52,7 +63,7 @@ def do(input):
     # first x of the row above)
 
     y = 1000  # tested to not be 100 until after row 1000
-    start_x = 0
+    x=start_x = 0
     while True:
         found = False
         x = start_x
@@ -79,8 +90,10 @@ def do(input):
                     break
             if amount_in_col >= 100:
                 # done
-                return start_x+i, y 
+                return (start_x+i) *10000 + y 
         y += 1
 
-input = open("../input/19", "r").readlines()
-print(do(input))
+if __name__ == "__main__":
+    input = open("../input/19", "r").readlines()
+    print(pt1(input))
+    print(pt2(input))
