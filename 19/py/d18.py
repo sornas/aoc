@@ -1,5 +1,6 @@
 import collections
 import heapq as heap
+import sys
 
 def neighbours(p):
     return [(p[0]+1, p[1]), (p[0]-1, p[1]), \
@@ -47,7 +48,6 @@ def path(start: tuple, end:tuple, board:dict, keys={}, doors={}, draw_search=Fal
     heap.heappush(h, (0, start, collections.deque()))
     while True:
         if len(h) == 0:
-            print(visited)
             return
         cur = heap.heappop(h)
         for n in neighbours(cur[1]):
@@ -66,11 +66,8 @@ def path(start: tuple, end:tuple, board:dict, keys={}, doors={}, draw_search=Fal
             heap.heappush(h, (cur[0] + 1, n, new_path))
             if draw_search:
                 time.sleep(0.0075)
-                print(draw(board, keys=keys, doors=doors, path=new_path, visited=visited))
-                print(end)
-                print(n)
 
-def avail(map, start, items, dead):
+def avail(map, start, items, dead, ignore=set(), ignore_except=set()):
     visited = set()
     avail = []
     q = collections.deque()
@@ -83,6 +80,8 @@ def avail(map, start, items, dead):
             avail.append((dist, pos, items[pos]))
             continue
         for n in neighbours(pos):
+            if n in ignore and n not in ignore_except:
+                continue
             if n in map and map[n] == "#":
                 continue
             if n in dead:
@@ -92,12 +91,6 @@ def avail(map, start, items, dead):
             visited.add(n)
             q.append((dist+1, n))
     return avail
-
-def seen_before(keys, paths):
-    for path in paths:
-        if set(keys) == set(path) and keys[-1] == path[-1]:
-            return True
-    return False
 
 input = open("../input/18", "r").readlines()
 
@@ -143,7 +136,7 @@ for _ in range(10):
             ends.add(tile)
         elif num_walls < 2:
             intersections.add(tile)
-    
+
     for end in ends:
         cur = end
         while cur not in intersections and cur not in map_keys and cur not in map_doors:
@@ -154,6 +147,7 @@ for _ in range(10):
                 if n not in walls and n not in dead:
                     cur = n
                     break
+
 paths = {}  # every path available between a door and a key
 start_paths = {}  # every path available from the starting point
 
@@ -162,46 +156,71 @@ for ent, s in map_keys_doors.items():
     for a in avail(map, ent, map_keys_doors, dead):
         paths[(s, a[2])] = a[0]
         graph[s] = graph.get(s, []) + [(a[2], a[0])]
-for a in avail(map, start, map_keys, dead):
+for a in avail(map, start, map_keys, dead, map_doors):
     start_paths[("@", map_keys[a[1]])] = a[0]
+
+def v_from_k(items: dict, item: str):
+    for k,v in items.items():
+        if item == v:
+            return k
+    return None
+
+def pos_from_item(item, keys, doors):
+    return v_from_k((keys if item.islower() else doors), item)
+
+def avail_keys(map, keys, doors, graph, start, keys_left, unlocked_doors):
+    visited = set()
+    avail = []
+    h = []
+    heap.heappush(h, (0, start))
+    while len(h) > 0:
+        dist, cur_key = heap.heappop(h)
+        if cur_key != start and cur_key.islower() and cur_key in keys_left:
+            avail.append((dist, cur_key))
+            continue
+        for n in graph[cur_key]:
+            if n[0].isupper() and n[0] not in unlocked_doors:
+                continue
+            if n[0] in visited:
+                continue
+            visited.add(n[0])
+            heap.heappush(h, (dist + n[1], n[0]))
+    return avail
 
 h = []
 
 for path, dist in start_paths.items():
     cur = path[1]
-    keys = [path[1]]
+    keys_left = set(map_keys.values()).copy()
+    keys_left.remove(cur)
     unlocked = set()
     unlocked.add(cur.upper())
-    heap.heappush(h, (dist, cur, keys, unlocked))
+    key_path = [cur]
+    heap.heappush(h, (dist, cur, keys_left, unlocked, key_path))
 
-m = 0
-seen = []
+best = len(map_keys)
+seen = set()
 
 while True:
-    print(len(h))
-    candidate = heap.heappop(h)
-    dist = candidate[0]
-    cur = candidate[1]
-    keys = candidate[2]
-    unlocked = candidate[3]
-
-    # if seen_before
-    if seen_before(keys, seen):
+    dist, key, keys_left, unlocked, key_path = heap.heappop(h)
+    #print("\nnode", dist, key, keys_left, unlocked, key_path)
+    if (frozenset(key_path), key) in seen:
+        #print("skipping", key_path, key)
         continue
-    seen.append(keys)
-
-    if len(unlocked) > m:
-        m = len(unlocked)
-        print(m, keys)
-        if len(unlocked) == len(map_doors):
-            break
-    
-    for n in graph[cur]:
-        if n[0].isupper() and n[0] not in unlocked:
-            continue
-        keys = keys.copy()
-        unlocked = unlocked.copy()
-        if n[0].islower():
-            keys.append(n[0])
-            unlocked.add(n[0].upper())
-        heap.heappush(h, (dist+n[1], n[0], keys, unlocked))
+    seen.add((frozenset(key_path), key))
+    if len(keys_left) == 0:
+        print(dist, "with path", key_path)
+        sys.exit()
+    if len(keys_left) < best:
+        best = len(keys_left)
+        print("best", len(unlocked), "with dist", dist, "and path", key_path)
+    for new_dist, new_key in avail_keys(map, map_keys, map_doors, graph, key, keys_left, unlocked):
+        #print("edge", new_dist, new_key)
+        new_keys_left = keys_left.copy()
+        new_keys_left.remove(new_key)
+        new_unlocked = unlocked.copy()
+        new_unlocked.add(new_key.upper())
+        new_key_path = key_path.copy()
+        new_key_path.append(new_key)
+        #print("adding", dist+new_dist, new_key, new_keys_left, new_unlocked, new_key_path)
+        heap.heappush(h, (dist + new_dist, new_key, new_keys_left, new_unlocked, new_key_path))
