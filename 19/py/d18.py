@@ -62,7 +62,7 @@ def avail_keys(map, keys, doors, graph, start, keys_left, unlocked_doors):
     visited = set()
     avail = []
     h = []
-    heap.heappush(h, (0, start))
+    heap.heappush(h, (0, str(start)))
     while len(h) > 0:
         dist, cur_key = heap.heappop(h)
         if cur_key != start and cur_key.islower() and cur_key in keys_left:
@@ -163,7 +163,7 @@ def pt1(input):
             continue
         seen.add((frozenset(key_path), key))
         if len(keys_left) == 0:
-            return dist
+            return dist, key_path
         if len(keys_left) < best:
             best = len(keys_left)
         for new_dist, new_key in avail_keys(map, map_keys, map_doors, graph, key, keys_left, unlocked):
@@ -174,6 +174,110 @@ def pt1(input):
             new_key_path = key_path.copy()
             new_key_path.append(new_key)
             heap.heappush(h, (dist + new_dist, new_key, new_keys_left, new_unlocked, new_key_path))
+
+def pt2(input):
+    map = {}
+    map_keys = {}
+    map_doors = {}
+    map_keys_doors = {}
+    walls = set()
+    tiles = set()
+    starts = [() for _ in range(4)]
+
+    for y in range(len(input)):
+        for x in range(len(input[y].strip())):
+            c = input[y][x]
+            p = (x,y)
+            if c.isdigit():
+                starts[int(c)-1] = p
+                map[p] = "."
+                map_keys[p] = c
+            elif c.isalpha():
+                if c.isupper():
+                    map_doors[p] = c
+                else:
+                    map_keys[p] = c
+                map[p] = "."
+            elif c == "#":
+                walls.add(p)
+                map[p] = c
+            elif c == ".":
+                tiles.add(p)
+                map[p] = c
+    map_keys_doors.update(map_keys)
+    map_keys_doors.update(map_doors)
+
+    dead = set()
+    for _ in range(10):
+        #TODO repeat until no further changes are done
+        ends = set()
+        intersections = set()
+        for tile in tiles:
+            num_walls = 0
+            for n in neighbours(tile):
+                if n in walls or n in dead:
+                    num_walls += 1
+            if num_walls == 3 and n:
+                ends.add(tile)
+            elif num_walls < 2:
+                intersections.add(tile)
+
+        for end in ends:
+            cur = end
+            while cur not in intersections and cur not in map_keys and \
+                    cur not in map_doors and cur not in starts:
+                dead.add(cur)
+                if cur in tiles:
+                    tiles.remove(cur)
+                for n in neighbours(cur):
+                    if n not in walls and n not in dead:
+                        cur = n
+                        break
+
+    paths = {}  # every path available between any door and any key (without passing another door or key
+    start_paths = [{} for _ in range(len(starts))]  # every path available from the starting point (including doors)
+
+    graph = {}  # {node: [children as tuples with name and distance]}
+    for ent, s in map_keys_doors.items():
+        for a in avail(map, ent, map_keys_doors, dead):
+            paths[(s, a[2])] = a[0]
+            graph[s] = graph.get(s, []) + [(a[2], a[0])]
+    for start in range(len(starts)):
+        for a in avail(map, starts[start], map_keys_doors, dead):
+            start_paths[start][("@", map_keys_doors[a[1]])] = a[0]
+
+    h = []
+    cur = [str(i+1) for i in range(len(starts))]
+    keys_left = set(map_keys.values()).copy()
+    for i in range(len(starts)):
+        keys_left.remove(str(i+1))
+    unlocked = set()
+    key_path = []
+    heap.heappush(h, (0, cur, keys_left, unlocked, key_path))
+
+    best = len(map_keys)
+    seen = set()
+
+    while True:
+        dist, keys, keys_left, unlocked, key_path = heap.heappop(h)
+        if (frozenset(key_path), tuple(keys)) in seen:
+            continue
+        seen.add((frozenset(key_path), tuple(keys)))
+        if len(keys_left) == 0:
+            return dist, key_path
+        if len(keys_left) < best:
+            best = len(keys_left)
+        for orig_start in range(len(starts)):
+            for new_dist, new_key in avail_keys(map, map_keys, map_doors, graph, keys[orig_start], keys_left, unlocked):
+                new_keys = keys.copy()
+                new_keys[orig_start] = new_key
+                new_keys_left = keys_left.copy()
+                new_keys_left.remove(new_key)
+                new_unlocked = unlocked.copy()
+                new_unlocked.add(new_key.upper())
+                new_key_path = key_path.copy()
+                new_key_path.append(new_key)
+                heap.heappush(h, (dist + new_dist, new_keys, new_keys_left, new_unlocked, new_key_path))
 
 if __name__ == "__main__":
     print(pt1(open("../input/18-1", "r").readlines()))
