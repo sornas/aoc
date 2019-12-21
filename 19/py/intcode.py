@@ -19,6 +19,8 @@ class Computer(object):
         self.instruction_cache = {}
         if ascii:
             self.SIG_ASCII = True
+        else:
+            self.SIG_ASCII = False
 
         self.reset()
 
