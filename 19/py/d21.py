@@ -1,3 +1,14 @@
+# program and idea for part 1:
+# jump if any tile of the first three aren't ground and the fourth is ground
+# J = (not A or not B or not C) and D
+# (dm) <=> J = not (A and B and C) and D
+# or A T
+# and B T
+# and C T
+# not T J
+# and D J
+# walk
+
 import intcode
 
 f = open("../input/21", "r").readlines()
