@@ -26,11 +26,11 @@ mods = [d01, d02, d03, d04, d05, d06, d07, d08, d09, d10, \
         d11, d12, d13, d14, d15, d16, d17, d18, d19, d20, \
         d21]
 
-skip = []
+skip = [19]
 
 for mod, day in zip(mods, range(len(mods))):
     if day+1 == 18:
-        print("input changed between part 1 and part 2, run it separatly")
+        print("input changed between part 1 and part 2 for day 18, run it separately")
         continue
     elif day+1 in skip:
         continue
