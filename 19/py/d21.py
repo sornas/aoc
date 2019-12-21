@@ -1,14 +1,3 @@
-# program and idea for part 1:
-# jump if any tile of the first three aren't ground and the fourth is ground
-# J = (not A or not B or not C) and D
-# (dm) <=> J = not (A and B and C) and D
-# or A T
-# and B T
-# and C T
-# not T J
-# and D J
-# walk
-
 import intcode
 
 f = open("../input/21", "r").readlines()
@@ -27,19 +16,14 @@ def ascii_draw(a):
             print("[INVALID ASCII]", c)
     return s
 
+jumpscript = open("21.js", "r").readlines()
+for line in jumpscript:
+    if line[0] != "#":
+        c.queue_ascii(line.strip().upper())
+        print(line.strip().upper())
+
 while not c.SIG_HALT:
     c.step()
-    if c.SIG_INPUT:
-        # flush output
-        print(ascii_draw(output))
-        output = []
-        if len(output) > 0:
-            output = []
-        while True:
-            s = input()
-            if s.upper() == "END":
-                break
-            c.queue_ascii(s.upper())
     if c.SIG_OUTPUT:
         output.append(c.output)
         c.output = None
