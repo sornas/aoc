@@ -62,8 +62,6 @@ for y in range(len(input)):
         else:
             del maze[p]
 
-print(tiles)
-
 alone_portals = {}  # { "JZ" : (25,50) ... }
 portal_pairs = {}  # { (25,50) : (30,30) ... ] contains reverse as well
 portals = set()
@@ -76,7 +74,6 @@ for y in range(len(input)):
             continue
         c = input[y][x]
         if c.isalpha():
-            print(c, "at", p)
             # find the other letter
             p2 = None
             if x < max_x and input[y][x+1].isalpha():
@@ -94,13 +91,11 @@ for y in range(len(input)):
             if p2 is None:
                 print("bad label near", p)
                 sys.exit()
-            print(portal, "found when checking", p2)
             checked.add(p2)
             # find the empty space
             location = None
             for n in neighbours(p) + neighbours(p2):
                 if n in tiles:
-                    print("found tile at", n)
                     location = n
             if location is None:
                 print("invalid location near", p)
@@ -134,9 +129,7 @@ visited = {0: set()}
 visited[0].add(start)
 heap.heappush(h, (0, 0, start))
 while len(h) > 0:
-    #print(draw(maze, start=start, end=end, portals=portal_pairs, visited=visited))
     cur = heap.heappop(h)
-    #print(len(h), cur)
     dist = cur[0]
     dimen = cur[1]
     point = cur[2]
@@ -146,8 +139,7 @@ while len(h) > 0:
         print(dist)
         break
     if point in portal_pairs:
-        if x > INSIDE_X_LO and x < INSIDE_X_HI and \
-                y > INSIDE_Y_LO and y < INSIDE_Y_HI:
+        if INSIDE_X_LO < x < INSIDE_X_HI and INSIDE_Y_LO < y < INSIDE_Y_HI:
             # inside donut
             dimen += 1
         else:
