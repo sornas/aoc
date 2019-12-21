@@ -13,10 +13,12 @@ BAS = 9
 HAL = 99
 
 class Computer(object):
-    def __init__(self, program):
+    def __init__(self, program, ascii=False):
         self.program = program
         self.memory_size = len(self.program)
         self.instruction_cache = {}
+        if ascii:
+            self.SIG_ASCII = True
 
         self.reset()
 
@@ -32,7 +34,6 @@ class Computer(object):
         self.output = None
 
         self.SIG_INPUT = False
-        self.SIG_ASCII = False
         self.SIG_OUTPUT = False
         self.SIG_HALT = False
 
@@ -43,11 +44,6 @@ class Computer(object):
         ops = str(op).zfill(param_amount[code]+2)
         self.instruction_cache[op] = [code] + [int(x) for x in ops[:-2][::-1]]
         return self.instruction_cache[op]
-        #return [code] + [(op // 10**(i+2)) % 10**(i+1) for i in range(param_amount[code])]
-
-    def clear_flags(self):
-        self.input  = None
-        self.output = None
 
     def write(self, addr, val):
         if addr >= self.memory_size:
