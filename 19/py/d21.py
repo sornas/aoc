@@ -2,14 +2,15 @@ import intcode
 
 def ascii_draw(a):
     s = ""
+    post = ""
     for c in a:
         if c == 10:
             s += "\n"
         elif c < 128:
             s += chr(c)
         else:
-            print("[INVALID ASCII]", c)
-    return s
+            post = "[INVALID ASCII]: " + str(c)
+    return s + ("\n" if post != "" else "") + post
 
 def do(c, jumpscript):
     output = []
