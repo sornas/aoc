@@ -1,3 +1,4 @@
+// JUMPSCRIPT FOR DAY 21 PART 1
 // A or B or C:
 // There is a gap somewhere in the next 3 tiles so we need to jump
 or A T
