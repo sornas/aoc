@@ -1,10 +1,5 @@
 import intcode
 
-f = open("../input/21", "r").readlines()
-
-c = intcode.Computer([int(x) for x in f[0].split(",")], ascii=True)
-output = []
-
 def ascii_draw(a):
     s = ""
     for c in a:
@@ -16,16 +11,27 @@ def ascii_draw(a):
             print("[INVALID ASCII]", c)
     return s
 
-jumpscript = open("21.js", "r").readlines()
-for line in jumpscript:
-    if line[0] != "#":
-        c.queue_ascii(line.strip().upper())
-        print(line.strip().upper())
+def do(c, jumpscript):
+    output = []
+    for line in jumpscript:
+        if line[:2] != "//":
+            c.queue_ascii(line.strip().upper())
+    while not c.SIG_HALT:
+        c.step()
+        if c.SIG_OUTPUT:
+            output.append(c.output)
+            c.output = None
+    return ascii_draw(output)
 
-while not c.SIG_HALT:
-    c.step()
-    if c.SIG_OUTPUT:
-        output.append(c.output)
-        c.output = None
-print(output)
-print(ascii_draw(output))
+def pt1(input):
+    c = intcode.Computer([int(x) for x in input[0].split(",")], ascii=True)
+    return do(c, open("21-1.js", "r").readlines())
+
+def pt2(input):
+    c = intcode.Computer([int(x) for x in input[0].split(",")], ascii=True)
+    return do(c, open("21-2.js", "r").readlines())
+
+if __name__ == "__main__":
+    input = open("../input/21", "r").readlines()
+    print(pt1(input))
+    print(pt2(input))
