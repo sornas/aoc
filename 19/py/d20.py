@@ -115,21 +115,13 @@ def pt1(input):
                     print(draw(maze, around=p))
                     sys.exit()
                 alone_portals[portal] = location
-    #print(draw(maze, start=start, end=end, portals=portal_pairs))
-
-    INSIDE_X_LO = 20
-    INSIDE_X_HI = 120
-    INSIDE_Y_LO = 20
-    INSIDE_Y_HI = 100
 
     # find shortest path between each portal (and start/end)
     h = []
     visited = set(start)
     heap.heappush(h, (0, start))
     while len(h) > 0:
-        cur = heap.heappop(h)
-        dist = cur[0]
-        point = cur[1]
+        dist, point = heap.heappop(h)
         x = point[0]
         y = point[1]
         if point == end:
