@@ -4,11 +4,7 @@ def deal(deck):
     return deck[::-1]
 
 def cut(deck, n):
-    if n > 0:
-        return deck[n:] + deck[:n]
-    else:
-        n = abs(n)
-        return deck[-n:] + deck[:-n]
+    return deck[n:] + deck[:n]
 
 def deal_incr(deck, incr):
     pos = 0
