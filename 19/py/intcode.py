@@ -13,14 +13,17 @@ BAS = 9
 HAL = 99
 
 class Computer(object):
-    def __init__(self, program, ascii=False):
+    def __init__(self, program, ascii=False, network_id=None):
         self.program = program
         self.memory_size = len(self.program)
         self.instruction_cache = {}
-        if ascii:
-            self.SIG_ASCII = True
-        else:
-            self.SIG_ASCII = False
+
+        self.SIG_ASCII = ascii
+
+        self.SIG_NET = False
+        if network_id is not None:
+            self.SIG_NET = True
+            self.network_id = network_id
 
         self.reset()
 
