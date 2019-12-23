@@ -12,6 +12,7 @@ waiting = [False for _ in range(len(computers))]
 prev_nat_x, prev_nat_y = -1, -1
 nat_x, nat_y = 0, 0
 
+pt1 = False
 while True:
     for i in range(len(computers)):
         c = computers[i]
@@ -31,6 +32,9 @@ while True:
                 addr, x, y = output_buffers[i]
                 output_buffers[i] = []
                 if addr == 255:
+                    if not pt1:
+                        print("pt1", y)
+                        pt1 = True
                     nat_x, nat_y = x, y
                 else:
                     queues[addr].append(x)
@@ -49,6 +53,6 @@ while True:
         queues[0].append(nat_x)
         queues[0].append(nat_y)
         if nat_y == prev_nat_y:
-            print(nat_y)
+            print("pt2", nat_y)
             sys.exit()
         prev_nat_x, prev_nat_y = nat_x, nat_y
