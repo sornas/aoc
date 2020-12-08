@@ -2,15 +2,15 @@
 import sys
 
 
-def pt1(_in):
+def run(prog):
     acc = 0
     loc = 0
     execed = set()
-    while True:
+    while loc < len(prog):
         if loc in execed:
-            return acc
+            return False, acc
         execed.add(loc)
-        inst, offset = _in[loc][:-1].split() # \n
+        inst, offset = prog[loc].strip().split()
         offset = int(offset)
         if inst == "acc":
             acc += offset
@@ -19,28 +19,14 @@ def pt1(_in):
             loc += offset
         else:
             loc += 1
+    return True, acc
+
+
+def pt1(_in):
+    return run(_in)[1]
 
 
 def pt2(_in):
-    def run(prog):
-        acc = 0
-        loc = 0
-        execed = set()
-        while loc < len(prog):
-            if loc in execed:
-                return False, acc
-            execed.add(loc)
-            inst, offset = prog[loc].strip().split()
-            offset = int(offset)
-            if inst == "acc":
-                acc += offset
-                loc += 1
-            elif inst == "jmp":
-                loc += offset
-            else:
-                loc += 1
-        return True, acc
-
     for i in range(len(_in)):
         prog = _in.copy()
         inst, offset = prog[i].strip().split()
