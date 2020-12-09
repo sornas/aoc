@@ -67,11 +67,11 @@ if __name__ == "__main__":
             print(f"maybe try {argv[0]} --help ?")
             i += 1
 
+    print("day  part | time   | tot_time | ans")
+    print("----------+--------+----------+-----------")
 
-    print("day part | time   | tot_time | ans")
-    print("---------+--------+----------+-----------")
-
-    time_to_here = 0
+    tot_time, tot_time_part = 0, [0, 0]
+    runs = 0
     for day, mod in enumerate((d01, d02, d03, d04, d05,
                                d06, d07, d08, d09)):
         if day+1 in skip or (only and day+1 not in only):
@@ -87,5 +87,12 @@ if __name__ == "__main__":
                 ans_time = time.time()
                 times.append(ans_time-start)
             avg_time = sum(times) / len(times)
-            time_to_here += avg_time
-            print(f"{day+1:02}  {part+1}    | {avg_time*1000:6.3f} | {time_to_here*1000:6.3f}   | {ans}")
+            tot_time += avg_time
+            tot_time_part[part] += avg_time
+            print(f" {day+1:2}     {part+1} | {avg_time*1000:6.3f} | {tot_time*1000:6.3f}   | {ans}")
+        runs += 1
+    print("----------+--------+----------+-----------")
+    if only_part in (0, 1):
+        print(f"average 1 | {tot_time_part[0]*1000/runs:6.3f} |")
+    if only_part in (0, 2):
+        print(f"average 2 | {tot_time_part[1]*1000/runs:6.3f} |")
