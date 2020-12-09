@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+import time
 
 
 def parse(prog):
@@ -49,5 +50,9 @@ if __name__ == "__main__":
         input = open(sys.argv[1], "r").readlines()
     else:
         input = open("../input/08", "r").readlines()
+    start = time.time()
+    input = parse(input)
     print(pt1(input))
+    print("pt1 {:.3}".format(time.time() - start))
     print(pt2(input))
+    print("pt2 {:.3}".format(time.time() - start))

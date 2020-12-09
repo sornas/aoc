@@ -2,6 +2,7 @@
 import sys
 import regex as re
 import functools
+import time
 
 
 class Node:
@@ -49,5 +50,7 @@ if __name__ == "__main__":
         input = open("../input/07", "r").readlines()
     # graph(parse(input))
 
-    print(pt1(input))
+    start = time.time()
     print(pt2(input))
+    print(pt1(input))
+    print(time.time() - start)
