@@ -11,7 +11,7 @@ class Node:
         self.children = children
 
     def __iter__(self):
-        yield from child for child, _ in self.children
+        yield from (child for child, _ in self.children)
 
 
 def parse(_in):
@@ -50,7 +50,5 @@ if __name__ == "__main__":
         input = open("../input/07", "r").readlines()
     # graph(parse(input))
 
-    start = time.time()
-    print(pt2(input))
     print(pt1(input))
-    print(time.time() - start)
+    print(pt2(input))
