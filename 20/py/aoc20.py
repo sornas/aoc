@@ -110,9 +110,9 @@ if __name__ == "__main__":
         print()
 
     if decorate:
-        print("    ---------", end="")
+        print("      -------", end="")
         if only_part == 0:
-            print("                ---------", end="")
+            print("                 -------", end="")
         print()
         print("tot   ", end="")
         if running_part(1):
