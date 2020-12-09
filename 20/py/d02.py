@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+import aoc20
+import sys
+
+
 def pt1(_in):
     valid = 0
     for passwd in _in:
@@ -27,6 +31,6 @@ def pt2(_in):
 
 
 if __name__ == "__main__":
-    input = open("../input/02", "r").readlines()
+    input = aoc20.read_input(sys.argv[1:], 2)
     print(pt1(input))
     print(pt2(input))

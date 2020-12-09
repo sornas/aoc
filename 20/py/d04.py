@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import aoc20
 import sys
 
 
@@ -92,9 +93,6 @@ def pt2(_in):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        input = open(sys.argv[1], "r").readlines()
-    else:
-        input = open("../input/04", "r").readlines()
+    input = aoc20.read_input(sys.argv[1:], 4)
     print(pt1(input))
     print(pt2(input))
