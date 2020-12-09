@@ -80,8 +80,10 @@ if __name__ == "__main__":
         print("    ", end="")
         if running_part(1):
             print("  -------Part 1--------", end="")
+        if only_part == 0:
+            print(" ", end="") # :(
         if running_part(2):
-            print("   -------Part 2--------", end="")
+            print("  -------Part 2--------", end="")
         print()
         print("Day", end="")
         print("     Time            Ans  ", end="")
