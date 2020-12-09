@@ -2,6 +2,10 @@
 import sys
 
 
+def parse(prog):
+    return [[(l := line.strip().split())[0], int(l[1])] for line in prog]
+
+
 def run(prog):
     acc = 0
     loc = 0
@@ -10,8 +14,7 @@ def run(prog):
         if loc in execed:
             return False, acc
         execed.add(loc)
-        inst, offset = prog[loc].strip().split()
-        offset = int(offset)
+        inst, offset = prog[loc]
         if inst == "acc":
             acc += offset
             loc += 1
@@ -29,11 +32,11 @@ def pt1(_in):
 def pt2(_in):
     for i in range(len(_in)):
         prog = _in.copy()
-        inst, offset = prog[i].strip().split()
+        inst, offset = prog[i]
         if inst == "jmp":
-            prog[i] = "nop 0"
+            prog[i][0] = "nop"
         elif inst == "nop":
-            prog[i] = f"jmp {offset}"
+            prog[i][0] = "jmp"
         else:
             continue
         ret, acc = run(prog)
