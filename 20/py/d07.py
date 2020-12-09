@@ -10,20 +10,7 @@ class Node:
         self.children = children
 
     def __iter__(self):
-        for child in self.children:
-            yield child[0]
-
-    def __repr__(self):
-        return self.name
-
-
-def graph(nodes):
-    print("digraph G {")
-    print("rankdir=\"LR\";")
-    for node in nodes.values():
-        for child in node.children:
-            print(f"\"{node.name}\" -> \"{child[0].name}\" [ label=\"{child[1]}\" ];")
-    print("}")
+        yield from child for child, _ in self.children
 
 
 def parse(_in):
@@ -49,7 +36,7 @@ def pt1(_in):
 def pt2(_in):
     @functools.cache
     def count_children(node):
-        return 1 + sum([child[1] * count_children(child[0]) for child in node.children])
+        return 1 + sum(child[1] * count_children(child[0]) for child in node.children)
 
     nodes = parse(_in)
     return count_children(nodes["shiny gold"]) - 1
