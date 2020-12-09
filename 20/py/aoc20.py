@@ -67,8 +67,20 @@ if __name__ == "__main__":
             print(f"maybe try {argv[0]} --help ?")
             i += 1
 
-    print("day  part | time   | tot_time | ans")
-    print("----------+--------+----------+-----------")
+    def running_part(part):
+        return only_part == 0 or part == only_part
+
+    print("    ", end="")
+    if running_part(1):
+        print("  -------Part 1--------", end="")
+    if running_part(2):
+        print("   -------Part 2--------", end="")
+    print()
+    print("Day", end="")
+    print("     Time            Ans  ", end="")
+    if only_part == 0:
+        print("   Time            Ans  ", end="")
+    print(" Total time")
 
     tot_time, tot_time_part = 0, [0, 0]
     runs = 0
@@ -77,8 +89,9 @@ if __name__ == "__main__":
         if day+1 in skip or (only and day+1 not in only):
             continue
         input = open(f"{input_root}/{day+1:02}").readlines()
+        print(f" {day+1:2}   ", end="")
         for part, part_func in enumerate((mod.pt1, mod.pt2)):
-            if only_part != 0 and part+1 != only_part:
+            if not running_part(part+1):
                 continue
             times = []
             for i in range(run_times):
@@ -89,10 +102,19 @@ if __name__ == "__main__":
             avg_time = sum(times) / len(times)
             tot_time += avg_time
             tot_time_part[part] += avg_time
-            print(f" {day+1:2}     {part+1} | {avg_time*1000:6.3f} | {tot_time*1000:6.3f}   | {ans}")
+            print(f"{avg_time*1000:6.3f} {ans:14}   ", end="")
+        print(f"{tot_time*1000:8.3f}")
+
         runs += 1
-    print("----------+--------+----------+-----------")
+    print("    ---------", end="")
+    if only_part == 0:
+        print("                ---------", end="")
+    print()
+    print("avg   ", end="")
     if only_part in (0, 1):
-        print(f"average 1 | {tot_time_part[0]*1000/runs:6.3f} |")
+        print(f"{tot_time_part[0]*1000/runs:6.3f}", end="")
+    if only_part == 0:
+        print("                   ", end="")
     if only_part in (0, 2):
-        print(f"average 2 | {tot_time_part[1]*1000/runs:6.3f} |")
+        print(f"{tot_time_part[1]*1000/runs:6.3f}", end="")
+    print()
