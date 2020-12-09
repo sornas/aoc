@@ -27,10 +27,11 @@ def run(prog):
 
 
 def pt1(_in):
-    return run(_in)[1]
+    return run(parse(_in))[1]
 
 
 def pt2(_in):
+    _in = parse(_in)
     for i in range(len(_in)):
         prog = _in.copy()
         inst, offset = prog[i]
@@ -50,9 +51,5 @@ if __name__ == "__main__":
         input = open(sys.argv[1], "r").readlines()
     else:
         input = open("../input/08", "r").readlines()
-    start = time.time()
-    input = parse(input)
     print(pt1(input))
-    print("pt1 {:.3}".format(time.time() - start))
     print(pt2(input))
-    print("pt2 {:.3}".format(time.time() - start))

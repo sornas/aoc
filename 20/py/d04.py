@@ -77,9 +77,7 @@ def pt2(_in):
     want = {s for s in "byr iyr eyr hgt hcl ecl pid cid".split()}
 
     for line in _in:
-        print(repr(line))
         if line == "\n":
-            print(want)
             if len(want) == 0 or (len(want) == 1 and "cid" in want):
                 valid += 1
             want = {s for s in "byr iyr eyr hgt hcl ecl pid cid".split()}
@@ -88,7 +86,6 @@ def pt2(_in):
             k, v = entry.strip().split(":")
             if valid_entry(k, v):
                 want.remove(k)
-    print(want)
     if len(want) == 0 or (len(want) == 1 and "cid" in want):
         valid += 1
     return valid
