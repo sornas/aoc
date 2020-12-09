@@ -2,7 +2,6 @@
 import sys
 import regex as re
 import functools
-import time
 
 
 class Node:
