@@ -111,10 +111,10 @@ if __name__ == "__main__":
         print("                ---------", end="")
     print()
     print("avg   ", end="")
-    if only_part in (0, 1):
+    if running_part(1):
         print(f"{tot_time_part[0]*1000/runs:6.3f}", end="")
     if only_part == 0:
         print("                   ", end="")
-    if only_part in (0, 2):
+    if running_part(2):
         print(f"{tot_time_part[1]*1000/runs:6.3f}", end="")
     print()
