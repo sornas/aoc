@@ -29,14 +29,15 @@ if __name__ == "__main__":
     only_part = 0
     run_times = 1
     input_root = "../input"
-    no_total = False
+    decorate = True
 
     argv, argc = sys.argv, len(sys.argv)
     i = 1
     while i < argc:
         if argv[i] == "--help":
             print(f"usage: {argv[0]} [--help] [--time [times]] [--skip <n> <n> ...]\n" +
-                   "       [--only <n> <n> ...] [--part 0|1|2] [--input <dir>]")
+                   "       [--only <n> <n> ...] [--part 0|1|2] [--input <dir>]\n" +
+                   "       [--no-decorate]")
             sys.exit(0)
         elif argv[i] == "--time":
             i += 1
@@ -63,9 +64,9 @@ if __name__ == "__main__":
             i += 1
             input_root = argv[i]
             i += 1
-        elif argv[i] == "--no-total":
+        elif argv[i] == "--no-decorate":
             i += 1
-            no_total = True
+            decorate = False
         else:
             print(f"unknown argument {argv[i]}")
             print(f"maybe try {argv[0]} --help ?")
@@ -74,22 +75,20 @@ if __name__ == "__main__":
     def running_part(part):
         return only_part == 0 or part == only_part
 
-    print("    ", end="")
-    if running_part(1):
-        print("  -------Part 1--------", end="")
-    if running_part(2):
-        print("   -------Part 2--------", end="")
-    print()
-    print("Day", end="")
-    print("     Time            Ans  ", end="")
-    if only_part == 0:
-        print("   Time            Ans", end="")
-    if not no_total:
-        print("   Total time", end="")
-    print()
+    if decorate:
+        print("    ", end="")
+        if running_part(1):
+            print("  -------Part 1--------", end="")
+        if running_part(2):
+            print("   -------Part 2--------", end="")
+        print()
+        print("Day", end="")
+        print("     Time            Ans  ", end="")
+        if only_part == 0:
+            print("   Time            Ans", end="")
+        print()
 
-    tot_time, tot_time_part = 0, [0, 0]
-    runs = 0
+    tot_time = [0, 0]
     for day, mod in enumerate((d01, d02, d03, d04, d05,
                                d06, d07, d08, d09)):
         if day+1 in skip or (only and day+1 not in only):
@@ -106,23 +105,20 @@ if __name__ == "__main__":
                 ans_time = time.time()
                 times.append(ans_time-start)
             avg_time = sum(times) / len(times)
-            tot_time += avg_time
-            tot_time_part[part] += avg_time
+            tot_time[part] += avg_time
             print(f"   {avg_time*1000:6.3f} {ans:14}", end="")
-        if not no_total:
-            print(f"   {tot_time*1000:8.3f}", end="")
         print()
 
-        runs += 1
-    print("    ---------", end="")
-    if only_part == 0:
-        print("                ---------", end="")
-    print()
-    print("avg   ", end="")
-    if running_part(1):
-        print(f"{tot_time_part[0]*1000/runs:6.3f}", end="")
-    if only_part == 0:
-        print("                  ", end="")
-    if running_part(2):
-        print(f"{tot_time_part[1]*1000/runs:6.3f}", end="")
-    print()
+    if decorate:
+        print("    ---------", end="")
+        if only_part == 0:
+            print("                ---------", end="")
+        print()
+        print("tot   ", end="")
+        if running_part(1):
+            print(f"{tot_time[0]*1000:6.3f}", end="")
+        if only_part == 0:
+            print("                  ", end="")
+        if running_part(2):
+            print(f"{tot_time[1]*1000:6.3f}", end="")
+        print()
