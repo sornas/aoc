@@ -29,6 +29,7 @@ if __name__ == "__main__":
     only_part = 0
     run_times = 1
     input_root = "../input"
+    no_total = False
 
     argv, argc = sys.argv, len(sys.argv)
     i = 1
@@ -62,6 +63,9 @@ if __name__ == "__main__":
             i += 1
             input_root = argv[i]
             i += 1
+        elif argv[i] == "--no-total":
+            i += 1
+            no_total = True
         else:
             print(f"unknown argument {argv[i]}")
             print(f"maybe try {argv[0]} --help ?")
@@ -79,8 +83,10 @@ if __name__ == "__main__":
     print("Day", end="")
     print("     Time            Ans  ", end="")
     if only_part == 0:
-        print("   Time            Ans  ", end="")
-    print(" Total time")
+        print("   Time            Ans", end="")
+    if not no_total:
+        print("   Total time", end="")
+    print()
 
     tot_time, tot_time_part = 0, [0, 0]
     runs = 0
@@ -89,7 +95,7 @@ if __name__ == "__main__":
         if day+1 in skip or (only and day+1 not in only):
             continue
         input = open(f"{input_root}/{day+1:02}").readlines()
-        print(f" {day+1:2}   ", end="")
+        print(f" {day+1:2}", end="")
         for part, part_func in enumerate((mod.pt1, mod.pt2)):
             if not running_part(part+1):
                 continue
@@ -102,8 +108,10 @@ if __name__ == "__main__":
             avg_time = sum(times) / len(times)
             tot_time += avg_time
             tot_time_part[part] += avg_time
-            print(f"{avg_time*1000:6.3f} {ans:14}   ", end="")
-        print(f"{tot_time*1000:8.3f}")
+            print(f"   {avg_time*1000:6.3f} {ans:14}", end="")
+        if not no_total:
+            print(f"   {tot_time*1000:8.3f}", end="")
+        print()
 
         runs += 1
     print("    ---------", end="")
@@ -114,7 +122,7 @@ if __name__ == "__main__":
     if running_part(1):
         print(f"{tot_time_part[0]*1000/runs:6.3f}", end="")
     if only_part == 0:
-        print("                   ", end="")
+        print("                  ", end="")
     if running_part(2):
         print(f"{tot_time_part[1]*1000/runs:6.3f}", end="")
     print()
