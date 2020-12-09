@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import aoc20
 import sys
-import regex as re
 import functools
 
 
@@ -9,6 +8,7 @@ class Node:
     def __init__(self, name, children=[]):
         self.name = name
         self.children = children
+        self.parents = []
 
     def __iter__(self):
         yield from (child for child, _ in self.children)
@@ -17,21 +17,30 @@ class Node:
 def parse(_in):
     nodes = {}
     for line in _in:
-        match = re.match(r"(\w+ \w+) bags contain (no other bags|(((\d+) (\w+ \w+)) bags?(, )?)+)\.", line)
-        children = [(node_str, int(amount)) for amount, node_str in zip(match.captures(5), match.captures(6))]
-        nodes[match[1]] = Node(match[1], children)
+        line = line.split()
+        # muted  lime bags contain 1  wavy  lime bag, 1 vibrant green bag, 3 light yellow bags.
+        # 0      1    2    3       4  5     6    7    8 9       10    11  12 13    14     15
+        # dotted teal bags contain no other bags.
+        if line[4] != "no":
+            children = [(" ".join(line[i+1:i+3]), int(line[i+0])) for i in range(4, len(line), 4)]
+        else:
+            children = []
+        name = " ".join(line[0:2])
+        nodes[name] = Node(name, children)
     for node in nodes.values():
         node.children = [(nodes[node_str], amount) for node_str, amount in node.children]
+        for child in node:
+            child.parents.append(node)
     return nodes
 
 
 def pt1(_in):
     @functools.cache
-    def can_contain(node, target):
-        return target in node or any(can_contain(child, target) for child in node)
+    def types_above(node):
+        return node.parents + list(functools.reduce(lambda a, b: a + b, (types_above(parent) for parent in node.parents), []))
 
     nodes = parse(_in)
-    return len([node for node in nodes.values() if can_contain(node, nodes["shiny gold"])])
+    return len(set(types_above(nodes["shiny gold"])))
 
 
 def pt2(_in):
