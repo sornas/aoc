@@ -14,15 +14,7 @@ def read_input(args, day):
 
 
 if __name__ == "__main__":
-    import d01
-    import d02
-    import d03
-    import d04
-    import d05
-    import d06
-    import d07
-    import d08
-    import d09
+    import importlib
 
     skip = set()
     only = set()
@@ -75,6 +67,15 @@ if __name__ == "__main__":
     def running_part(part):
         return only_part == 0 or part == only_part
 
+    days = []
+    for day in range(25):
+        if day+1 in skip or (only and day+1 not in only):
+            continue
+        try:
+            days.append((day+1, importlib.import_module(f"d{day+1:02}")))
+        except:
+            break
+
     if decorate:
         print("    ", end="")
         if running_part(1):
@@ -89,12 +90,9 @@ if __name__ == "__main__":
         print()
 
     tot_time = [0, 0]
-    for day, mod in enumerate((d01, d02, d03, d04, d05,
-                               d06, d07, d08, d09)):
-        if day+1 in skip or (only and day+1 not in only):
-            continue
-        input = open(f"{input_root}/{day+1:02}").readlines()
-        print(f" {day+1:2}", end="")
+    for day, mod in days:
+        input = open(f"{input_root}/{day:02}").readlines()
+        print(f" {day:2}", end="")
         for part, part_func in enumerate((mod.pt1, mod.pt2)):
             if not running_part(part+1):
                 continue
