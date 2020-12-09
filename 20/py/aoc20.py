@@ -28,12 +28,14 @@ if __name__ == "__main__":
     only = set()
     only_part = 0
     run_times = 1
+    input_root = "../input"
 
     argv, argc = sys.argv, len(sys.argv)
     i = 1
     while i < argc:
         if argv[i] == "--help":
-            print(f"usage: {argv[0]} [--help] [--time [times]] [--skip <n> <n> ...] [--only <n> <n> ...] [--part 0|1|2]")
+            print(f"usage: {argv[0]} [--help] [--time [times]] [--skip <n> <n> ...]\n" +
+                   "       [--only <n> <n> ...] [--part 0|1|2] [--input <dir>]")
             sys.exit(0)
         elif argv[i] == "--time":
             i += 1
@@ -56,6 +58,10 @@ if __name__ == "__main__":
             i += 1
             only_part = int(argv[i])
             i += 1
+        elif argv[i] == "--input":
+            i += 1
+            input_root = argv[i]
+            i += 1
         else:
             print(f"unknown argument {argv[i]}")
             print(f"maybe try {argv[0]} --help ?")
@@ -70,7 +76,7 @@ if __name__ == "__main__":
                                d06, d07, d08, d09)):
         if day+1 in skip or (only and day+1 not in only):
             continue
-        input = open(f"../input/{day+1:02}").readlines()
+        input = open(f"{input_root}/{day+1:02}").readlines()
         for part, part_func in enumerate((mod.pt1, mod.pt2)):
             if only_part != 0 and part+1 != only_part:
                 continue
