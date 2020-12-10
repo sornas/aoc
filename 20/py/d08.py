@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import aoc20
 import sys
+from copy import deepcopy
 
 
 def parse(prog):
@@ -33,7 +34,7 @@ def pt1(_in):
 def pt2(_in):
     _in = parse(_in)
     for i in range(len(_in)):
-        prog = _in.copy()
+        prog = deepcopy(_in)
         inst, offset = prog[i]
         if inst == "jmp":
             prog[i][0] = "nop"
