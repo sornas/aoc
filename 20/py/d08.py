@@ -5,7 +5,7 @@ from copy import deepcopy
 
 
 def parse(prog):
-    return [[(l := line.strip().split())[0], int(l[1])] for line in prog]
+    return [((l := line.strip().split())[0], int(l[1])) for line in prog]
 
 
 def run(prog):
@@ -32,19 +32,20 @@ def pt1(_in):
 
 
 def pt2(_in):
-    _in = parse(_in)
-    for i in range(len(_in)):
-        prog = deepcopy(_in)
-        inst, offset = prog[i]
+    prog = parse(_in)
+    for i in range(len(prog)):
+        orig = prog[i]
+        inst, offset = orig
         if inst == "jmp":
-            prog[i][0] = "nop"
+            prog[i] = ("nop", offset)
         elif inst == "nop":
-            prog[i][0] = "jmp"
+            prog[i] = ("jmp", offset)
         else:
             continue
         ret, acc = run(prog)
         if ret:
             return acc
+        prog[i] = orig
 
 
 if __name__ == "__main__":
