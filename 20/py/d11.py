@@ -3,24 +3,17 @@ import aoc20
 import sys
 
 
-def vis(board, w, h):
-    s = ""
+def read(lines):
+    board = {}
+    h = len(lines)
+    w = len(lines[0])
     for y in range(h):
         for x in range(w):
-            p = (x, y)
-            if p in board:
-                if board[p] == -1:
-                    s += "."
-                elif board[p] == 0:
-                    s += "L"
-                elif board[p] == 1:
-                    s += "#"
-                else:
-                    s += "?"
-            else:
-                s += "?"
-        s += "\n"
-    return s
+            if lines[y][x] == "L":
+                board[(x, y)] = 0
+            elif lines[y][x] == ".":
+                board[(x, y)] = -1
+    return board, w, h
 
 
 def amount_neighbours_occ(p, board):
@@ -36,16 +29,7 @@ def amount_neighbours_occ(p, board):
 
 
 def pt1(_in):
-    board = {}
-    h = len(_in)
-    w = len(_in[0])
-    for y in range(h):
-        for x in range(w):
-            if _in[y][x] == "L":
-                board[(x, y)] = 0
-            elif _in[y][x] == ".":
-                board[(x, y)] = -1
-
+    board, w, h = read(_in)
     while True:
         prev_board = board.copy()
         for p, state in prev_board.items():
@@ -86,16 +70,7 @@ def amount_in_sight_occ(p, board, w, h):
 
 
 def pt2(_in):
-    board = {}
-    h = len(_in)
-    w = len(_in[0])
-    for y in range(h):
-        for x in range(w):
-            if _in[y][x] == "L":
-                board[(x, y)] = 0
-            elif _in[y][x] == ".":
-                board[(x, y)] = -1
-
+    board, w, h = read(_in)
     while True:
         prev_board = board.copy()
         for p, state in prev_board.items():
