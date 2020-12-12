@@ -106,7 +106,7 @@ if __name__ == "__main__":
                 times.append(ans_time-start)
             avg_time = sum(times) / len(times)
             tot_time[part] += avg_time
-            print(f"   {avg_time*1000:6.3f} {ans:14}", end="")
+            print(f" {avg_time*1000:8.3f} {ans:14}", end="")
         print()
 
     if decorate:

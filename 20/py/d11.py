@@ -1,94 +1,127 @@
 #!/usr/bin/env python3
 import aoc20
 import sys
+import functools
+
+
+def vis(board):
+    s = ""
+    for r in board:
+        for c in r:
+            s += "T" if c[0] else "F"
+            s += str(c[1]) if c[1] >= 0 else "-"
+            s += str(c[2])
+            s += " "
+        s += "\n"
+    return s
 
 
 def read(lines):
-    board = {}
+    board = []
     h = len(lines)
-    w = len(lines[0])
+    w = len(lines[0]) - 1
     for y in range(h):
+        row = []
         for x in range(w):
             if lines[y][x] == "L":
-                board[(x, y)] = 0
+                row.append([False, 0, 0, []])
             elif lines[y][x] == ".":
-                board[(x, y)] = -1
+                row.append([False, -1, 0, []])
+        board.append(row)
+
+    def update_in_sight(x, y):
+        for dy in range(-1, 1+1):
+            for dx in range(-1, 1+1):
+                if dy == dx == 0:
+                    continue
+                step = 0
+                while True:
+                    step += 1
+                    px, py = x + (dx * step), y + (dy * step)
+                    if px < 0 or px >= w or py < 0 or py >= h:
+                        break
+                    if board[py][px][1] != -1:
+                        board[py][px][3].append((x, y))
+                        break
+
+    for y in range(h):
+        for x in range(w):
+            update_in_sight(x, y)
     return board, w, h
 
 
-def amount_neighbours_occ(p, board):
-    amount = 0
+@functools.cache
+def neighbours_occ(p, w, h):
+    n = []
     for dy in range(-1, 1+1):
-        for dx in range(-1, 1+1):
-            if dy == dx == 0:
-                continue
-            new_p = (p[0] + dx, p[1] + dy)
-            if new_p in board and board[new_p] == 1:
-                amount += 1
-    return amount
+        py = p[1] + dy
+        if 0 <= py < h:
+            for dx in range(-1, 1+1):
+                if dy == dx == 0:
+                    continue
+                px = p[0] + dx
+                if 0 <= px < w:
+                    n.append((px, py))
+    return n
 
 
 def pt1(_in):
     board, w, h = read(_in)
     while True:
-        prev_board = board.copy()
-        for p, state in prev_board.items():
-            if state == 0:
-                # empty
-                if amount_neighbours_occ(p, prev_board) == 0:
-                    board[p] = 1
-            if state == 1:
-                # occ
-                if amount_neighbours_occ(p, prev_board) >= 4:
-                    board[p] = 0
-        if prev_board == board:
+        changed = False
+        for y in range(h):
+            for x in range(w):
+                if not board[y][x][0] and board[y][x][1] == 0:
+                    changed = True
+                    board[y][x][0] = True
+                    for nx, ny in neighbours_occ((x, y), w, h):
+                        board[ny][nx][2] += 1
+                if board[y][x][0] and board[y][x][1] >= 4:
+                    changed = True
+                    board[y][x][0] = False
+                    for nx, ny in neighbours_occ((x, y), w, h):
+                        board[ny][nx][2] -= 1
+        for y in range(h):
+            for x in range(w):
+                if board[y][x][1] != -1:
+                    board[y][x][1] = board[y][x][2]
+        if not changed:
             break
-        prev_board = board
     res = 0
-    for _, state in board.items():
-        if state == 1:
-            res += 1
+    for y in range(h):
+        for x in range(w):
+            if board[y][x][0]:
+                res += 1
     return res
-
-
-def amount_in_sight_occ(p, board, w, h):
-    amount = 0
-    dirs = ((1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1))
-    for dir in dirs:
-        step = 0
-        while True:
-            step += 1
-            new_p = p[0] + dir[0] * step, p[1] + dir[1] * step
-            if new_p not in board:
-                break
-            if board[new_p] == -1:
-                continue
-            if board[new_p] == 1:
-                amount += 1
-            break
-    return amount
 
 
 def pt2(_in):
     board, w, h = read(_in)
     while True:
-        prev_board = board.copy()
-        for p, state in prev_board.items():
-            if state == 0:
-                # empty
-                if amount_in_sight_occ(p, prev_board, w, h) == 0:
-                    board[p] = 1
-            if state == 1:
-                # occ
-                if amount_in_sight_occ(p, prev_board, w, h) >= 5:
-                    board[p] = 0
-        if prev_board == board:
+        changed = False
+        for y in range(h):
+            for x in range(w):
+                if not board[y][x][0] and board[y][x][1] == 0:
+                    changed = True
+                    board[y][x][0] = True
+                    for nx, ny in board[y][x][3]:
+                        board[ny][nx][2] += 1
+                if board[y][x][0] and board[y][x][1] >= 5:
+                    changed = True
+                    board[y][x][0] = False
+                    for nx, ny in board[y][x][3]:
+                        board[ny][nx][2] -= 1
+        for y in range(h):
+            for x in range(w):
+                if board[y][x][1] != -1:
+                    board[y][x][1] = board[y][x][2]
+        if not changed:
             break
-        prev_board = board
     res = 0
-    for _, state in board.items():
-        if state == 1:
-            res += 1
+    for y in range(h):
+        for x in range(w):
+            if board[y][x][0]:
+                res += 1
     return res
 
 
