@@ -114,11 +114,11 @@ if __name__ == "__main__":
         if only_part == 0:
             print("                 -------", end="")
         print()
-        print("tot   ", end="")
+        print("tot ", end="")
         if running_part(1):
-            print(f"{tot_time[0]*1000:6.3f}", end="")
+            print(f"{tot_time[0]*1000:8.3f} ms", end="")
         if only_part == 0:
-            print("                  ", end="")
+            print("             ", end="")
         if running_part(2):
-            print(f"{tot_time[1]*1000:6.3f}", end="")
+            print(f"{tot_time[1]*1000:8.3f} ms", end="")
         print()
