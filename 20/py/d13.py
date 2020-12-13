@@ -26,10 +26,8 @@ def pt2(_in):
     N = 1
     for dep, bus in busses.items():
         N *= bus
-    x = 0
-    for dep, bus in busses.items():
-        x += -dep * (N // bus) * mul_inv(N // bus, bus)
-    return x % N
+    return sum(-dep * (N // bus) * mul_inv(N // bus, bus)
+               for dep, bus in busses.items()) % N
 
 
 if __name__ == "__main__":
