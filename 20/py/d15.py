@@ -3,28 +3,11 @@ import aoc20
 import sys
 
 
-def pt1(_in):
-    nums = [int(n) for n in _in[0].split(",")]
-    prev = {n: i for i, n in enumerate(nums)}
-    while len(nums) < 2020:
-        cur = nums[-1]
-        if cur not in prev:
-            nums.append(0)
-            prev[cur] = len(nums) - 2
-        else:
-            nums.append(len(nums) - 1 - prev[cur])
-            prev[cur] = len(nums) - 2
-    return nums[2019]
-
-
-def pt2(_in):
-    nums = [int(n) for n in _in[0].split(",")]
-    amount = 3
-    cur = nums[-1]
-    prev = {n: i for i, n in enumerate(nums)}
-    while amount < 30000000:
-        if amount % 300000 == 0:
-            print(amount // 300000)
+def say_nth(start, nth):
+    amount = len(start)
+    cur = start[-1]
+    prev = {n: i for i, n in enumerate(start)}
+    while amount < nth:
         if cur not in prev:
             new = 0
             prev[cur] = amount - 1
@@ -34,6 +17,14 @@ def pt2(_in):
         cur = new
         amount += 1
     return cur
+
+
+def pt1(_in):
+    return say_nth([int(n) for n in _in[0].split(",")], 2020)
+
+
+def pt2(_in):
+    return say_nth([int(n) for n in _in[0].split(",")], 30000000)
 
 
 if __name__ == "__main__":
