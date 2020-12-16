@@ -42,7 +42,7 @@ def pt2(_in):
     #   assume it can be anything
     candidates = [set(range(20)) for _ in range(20)]  # one set per field
 
-    for t, ticket in enumerate(tickets):
+    for ticket in tickets:
         for f, field in enumerate(ticket):
             for c, constraint in enumerate(constraints):
                 if c in candidates[f] and not any(field in cons for cons in constraint):
