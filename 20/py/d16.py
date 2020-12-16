@@ -4,14 +4,15 @@ import sys
 
 
 def pt1(_in):
-    constraints = [[range(int((b := a.split("-"))[0]), int(b[1])+1)
-                    for a in line.split(": ")[1].split(" or ")]
-                   for line in _in[:20]]
     return sum(sum(int(field)
                    for field in line.strip().split(",")
                    if not any(any(int(field) in cons
                                   for cons in constraint)
-                              for constraint in constraints))
+                              for constraint in [[range(int(a.split("-")[0]),
+                                                        int(a.split("-")[1])+1)
+                                                  for a in line.split(": ")[1]
+                                                               .split(" or ")]
+                                                 for line in _in[:20]]))
                for line in _in[25:])
 
 
