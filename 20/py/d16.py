@@ -4,14 +4,7 @@ import sys
 
 
 def pt1(_in):
-    things = []
-    for line in _in[:20]:
-        thing = []
-        line = line.strip().split(": ")
-        for a in line[1].split(" or "):
-            b = a.split("-")
-            thing.append(range(int(b[0]), int(b[1])+1))
-        things.append(thing)
+    constraints = [[range(int((b := a.split("-"))[0]), int(b[1])+1) for a in line.split(": ")[1].split(" or ")] for line in _in[:20]]
     res = 0
     for line in _in[25:]:
         for n in line.strip().split(","):
@@ -27,14 +20,7 @@ def pt1(_in):
 
 
 def pt2(_in):
-    constraints = []
-    for line in _in[:20]:
-        thing = []
-        line = line.strip().split(": ")
-        for a in line[1].split(" or "):
-            b = a.split("-")
-            thing.append(range(int(b[0]), int(b[1])+1))
-        constraints.append(thing)
+    constraints = [[range(int((b := a.split("-"))[0]), int(b[1])+1) for a in line.split(": ")[1].split(" or ")] for line in _in[:20]]
 
     tickets = []
     for line in _in[25:]:
