@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import aoc20
 import sys
+from functools import reduce
 
 
 def pt1(_in):
@@ -45,17 +46,15 @@ def pt2(_in):
             if len(cand) == 1:
                 know[c] = cand.pop()
                 to_remove = know[c]
-                break
         for cand in candidates:
             if to_remove in cand:
                 cand.remove(to_remove)
 
-    my = list(int(n) for n in _in[22].strip().split(","))
-    res = 1
-    for f, field in enumerate(know):
-        if field < 6:
-            res *= my[f]
-    return res
+    return reduce(lambda x, y: x * y,
+                  (int(_in[22].strip().split(",")[f])
+                   for f, field in enumerate(know)
+                   if field < 6),
+                  1)
 
 
 if __name__ == "__main__":
