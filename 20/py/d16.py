@@ -20,23 +20,17 @@ def pt1(_in):
 
 
 def pt2(_in):
-    constraints = [[range(int((b := a.split("-"))[0]), int(b[1])+1) for a in line.split(": ")[1].split(" or ")] for line in _in[:20]]
+    constraints = [[range(int((b := a.split("-"))[0]), int(b[1])+1)
+                    for a in line.split(": ")[1].split(" or ")]
+                   for line in _in[:20]]
 
-    tickets = []
-    for line in _in[25:]:
-        valid_ticket = True
-        for n in line.strip().split(","):
-            n = int(n)
-            valid_field = False
-            for thing in constraints:
-                if any(n in r for r in thing):
-                    valid_field = True
-                    break
-            if not valid_field:
-                valid_ticket = False
-                break
-        if valid_ticket:
-            tickets.append(list(int(n) for n in line.strip().split(",")))
+    # all(any(any())) => ALL numbers on a ticket match ANY constraint in ANY constraint group
+    tickets = [[int(n) for n in line.strip().split(",")]
+               for line in _in[25:]
+               if all(any(any(int(n) in cons
+                              for cons in constraint)
+                          for constraint in constraints)
+                      for n in line.strip().split(","))]
 
     # for each field
     #   assume it can be anything
