@@ -2,7 +2,6 @@ import aoc20
 import sys
 import itertools
 
-
 UP, RIGHT, DOWN, LEFT = 0, 1, 2, 3
 
 
@@ -64,13 +63,15 @@ def next_pos(p, w):
     return ((x+1) % w, y + (x+1)//w)
 
 
-def pt1(_in):
+def gen_image(_in):
     w = h = 12
+    tile_borders = dict()
     tiles = dict()
-    for tile in "".join(_in).split("\n\n"):
+    for tile in "".join(_in)[:-1].split("\n\n"):
         num = int(tile.split("\n")[0].split(" ")[1][:-1])
 
-        tiles[num] = all_tiles(tile[tile.find(":")+1:].replace("\n", ""))
+        tile_borders[num] = all_tiles(tile[tile.find(":")+2:].replace("\n", ""))
+        tiles[num] = tile[tile.find(":")+2:]
 
     def test(state, next, left, placed):
         # state: {(x, y): (UP, RIGHT, DOWN, LEFT)}
@@ -80,20 +81,100 @@ def pt1(_in):
             return state, placed
 
         for tile in left:
-            for mod in tiles[tile]:
+            for i, mod in enumerate(tile_borders[tile]):
                 new = state.copy()
                 new[next] = mod
                 if valid(new, next, w, h):
-                    test_res = test(new, next_pos(next, w), left - set([tile]), placed + [tile])
+                    test_res = test(new, next_pos(next, w), left - set([tile]), placed + [(tile, i)])
                     if test_res:
                         return test_res
 
-    res = test(dict(), (0, 0), set(tiles.keys()), [])[1]
-    return res[0] * res[11] * res[-12] * res[-1]
+    return test(dict(), (0, 0), set(tile_borders.keys()), []), tiles
+
+
+def pt1(_in):
+    res = gen_image(_in)[0][1]
+    return res[0][0] * res[11][0] * res[-12][0] * res[-1][0]
 
 
 def pt2(_in):
-    pass
+    image = gen_image(_in)
+
+    def rotate_cw(mat, s):
+        res = [[None for _ in range(s)] for _ in range(s)]
+        for y in range(s):
+            for x in range(s):
+                res[x][s-y-1] = mat[y][x]
+        return res
+
+    def mirror(mat, s):
+        res = [[None for _ in range(s)] for _ in range(s)]
+        for y in range(s):
+            for x in range(s):
+                res[y][x] = mat[s-y-1][x]
+        return res
+
+    def mir_rot(mat, mod):
+        for _ in range(mod % 4):
+            mat = rotate_cw(mat, len(mat))
+        if mod // 4 == 1:
+            mat = mirror(mat, len(mat))
+        return mat
+
+    def has_monster(image, x, y, w, h):
+        monster = [
+            "                  # ",
+            "#    ##    ##    ###",
+            " #  #  #  #  #  #   "
+        ]
+        for dy in range(len(monster)):
+            img_y = y + dy
+            if not 0 <= img_y < h:
+                return False
+            for dx in range(len(monster[dy])):
+                img_x = x + dx
+                if not 0 <= img_x < w:
+                    return False
+                if monster[dy][dx] == "#" and image[img_y][img_x] != "#":
+                    return False
+        return True
+
+    # orient tiles
+    tiles = []
+    for tile in image[0][1]:
+        rows, mod = image[1][tile[0]].split("\n"), tile[1]
+        rows = mir_rot(rows, mod)
+        tiles.append(rows)
+
+    # remove borders
+    borderless = []
+    for tile in tiles:
+        # remove first and last rows
+        tile = tile[1:-1]
+        # remove first and last element in each row
+        tile = [row[1:-1] for row in tile]
+        borderless.append(tile)
+
+    # build the total image
+    total = []
+    for tile_row in range(12):
+        for row in range(8):
+            s = ""
+            for tile in range(12):
+                s += "".join(borderless[tile_row*12 + tile][row])
+            total.append(s)
+
+    for mod in range(8):
+        image = mir_rot(total, mod)
+        monsters = 0
+        h = len(image)
+        w = len(image[0])
+        for y in range(h):
+            for x in range(w):
+                if has_monster(image, x, y, w, h):
+                    monsters += 1
+        if monsters != 0:
+            return sum(row.count("#") for row in image) - monsters * 15
 
 
 if __name__ == "__main__":
