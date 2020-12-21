@@ -13,17 +13,14 @@ def allergens(line):
 
 
 def pt1(_in):
-    all_ingredients = []
-    for line in _in:
-        all_ingredients.extend(ingredients(line))
+    all_ingredients = list(itertools.chain.from_iterable(ingredients(line) for line in _in))
 
     might_be = defaultdict(lambda: set(all_ingredients))
     for line in _in:
         for alg in allergens(line):
             might_be[alg] &= set(ingredients(line))
-    might_be = set.union(*might_be.values())
-    defo_not = set(all_ingredients) - might_be
-    return sum(all_ingredients.count(ing) for ing in defo_not)
+    return sum(all_ingredients.count(ing)
+               for ing in set(all_ingredients) - set.union(*might_be.values()))
 
 
 def pt2(_in):
