@@ -27,7 +27,15 @@ def pt1(_in):
 
 
 def pt2(_in):
-    pass
+    all_ingredients = []
+    for line in _in:
+        all_ingredients.extend(ingredients(line))
+
+    might_be = defaultdict(lambda: set(all_ingredients))
+    for line in _in:
+        for alg in allergens(line):
+            might_be[alg] &= set(ingredients(line))
+    print(might_be)
 
 
 if __name__ == "__main__":
