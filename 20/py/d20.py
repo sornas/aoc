@@ -25,48 +25,70 @@ def rotations(lst):
 
 def all_tiles(tile):
     # assumes 10x10 tile as 100 chars
+    # returns the eight different transformations:
+    # [
+    #   rotated cw  mirrored through horizontal
+    #   0           no
+    #   1           no
+    #   2           no
+    #   3           no
+    #   0           yes
+    #   1           yes
+    #   2           yes
+    #   3           yes
+    # ]
     tiles = []
-    tiles.append(tile[:10]) # top
+    tiles.append(tile[:10])   # up
     tiles.append(tile[9::10]) # right
-    tiles.append(tile[-10:]) # bottom
-    tiles.append(tile[::10]) # left
+    tiles.append(tile[-10:])  # down
+    tiles.append(tile[::10])  # left
     tiles = list(map(lambda r: int(r.replace("#", "1").replace(".", "0"), 2), tiles))
 
     tiles = rotations(tiles)
-    tiles += [[tile[DOWN], mirror(tile[RIGHT]), tile[UP], mirror(tile[LEFT])]
+    # mirror through horizontal by
+    #   flipping up and down
+    #   mirroring left and right respectively
+    tiles += [[tile[DOWN],           # up
+               mirror(tile[RIGHT]),  # right
+               tile[UP],             # down
+               mirror(tile[LEFT])]   # left
               for tile in tiles]
     return tiles
 
 
 def neighbours(p, w, h):
+    # None if outside w, h
     return [
         (p[0], p[1]-1) if p[1]-1 >= 0 else None,
-        (p[0]+1, p[1]) if p[0]+1 < w else None,
-        (p[0], p[1]+1) if p[1]+1 < h else None,
+        (p[0]+1, p[1]) if p[0]+1 < w  else None,
+        (p[0], p[1]+1) if p[1]+1 < h  else None,
         (p[0]-1, p[1]) if p[0]-1 >= 0 else None,
     ]
 
 
 def valid(state, p, w, h):
     n = neighbours(p, w, h)
-    res = all((
+    # a neighbour is valid if any of the following:
+    #   it's outside w, h
+    #   it's inside w, h but not placed
+    #   it's placed and its corresponding side matches this position's side
+    return all((
         not n[UP] or n[UP] not in state or state[p][UP] == state[n[UP]][DOWN],
         not n[RIGHT] or n[RIGHT] not in state or state[p][RIGHT] == state[n[RIGHT]][LEFT],
         not n[DOWN] or n[DOWN] not in state or state[p][DOWN] == state[n[DOWN]][UP],
         not n[LEFT] or n[LEFT] not in state or state[p][LEFT] == state[n[LEFT]][RIGHT],
     ))
-    return res
 
 
 def next_pos(p, w):
+    # like a typewriter
     x, y = p
     return ((x+1) % w, y + (x+1)//w)
 
 
-def gen_image(_in):
-    w = h = 12
-    tile_borders = dict()
-    tiles = dict()
+def gen_image(_in, w, h):
+    tile_borders = dict() # id: [sides as encoded numbers]
+    tiles = dict()        # id: [rows as characters]
     for tile in "".join(_in)[:-1].split("\n\n"):
         num = int(tile.split("\n")[0].split(" ")[1][:-1])
 
@@ -77,6 +99,9 @@ def gen_image(_in):
         # state: {(x, y): (UP, RIGHT, DOWN, LEFT)}
         # next: (x, y), next empty position
         # left: set(tile), tile indicies available
+        # placed: [(tile, mod)], placed tiles and their modification id
+        #
+        # returns a valid state or None if none exist
         if not left:
             return state, placed
 
@@ -88,17 +113,18 @@ def gen_image(_in):
                     test_res = test(new, next_pos(next, w), left - set([tile]), placed + [(tile, i)])
                     if test_res:
                         return test_res
+        return None
 
     return test(dict(), (0, 0), set(tile_borders.keys()), []), tiles
 
 
 def pt1(_in):
-    res = gen_image(_in)[0][1]
+    res = gen_image(_in, 12, 12)[0][1]
     return res[0][0] * res[11][0] * res[-12][0] * res[-1][0]
 
 
 def pt2(_in):
-    image = gen_image(_in)
+    image = gen_image(_in, 12, 12)
 
     def rotate_cw(mat, s):
         res = [[None for _ in range(s)] for _ in range(s)]
@@ -117,7 +143,7 @@ def pt2(_in):
     def mir_rot(mat, mod):
         for _ in range(mod % 4):
             mat = rotate_cw(mat, len(mat))
-        if mod // 4 == 1:
+        for _ in range(mod // 4):
             mat = mirror(mat, len(mat))
         return mat
 
@@ -140,39 +166,32 @@ def pt2(_in):
         return True
 
     # orient tiles
-    tiles = []
-    for tile in image[0][1]:
-        rows, mod = image[1][tile[0]].split("\n"), tile[1]
-        rows = mir_rot(rows, mod)
-        tiles.append(rows)
+    tiles = [mir_rot(image[1][tile[0]].split("\n"), tile[1])
+             for tile in image[0][1]]
 
     # remove borders
-    borderless = []
-    for tile in tiles:
-        # remove first and last rows
-        tile = tile[1:-1]
-        # remove first and last element in each row
-        tile = [row[1:-1] for row in tile]
-        borderless.append(tile)
+    tiles = [[row[1:-1]
+              for row in tile[1:-1]]
+             for tile in tiles]
 
     # build the total image
     total = []
     for tile_row in range(12):
         for row in range(8):
-            s = ""
-            for tile in range(12):
-                s += "".join(borderless[tile_row*12 + tile][row])
-            total.append(s)
+            total.append("".join(["".join(tiles[tile_row*12 + tile][row]) for tile in range(12)]))
+    #TODO this should work
+    # total = ["".join(["".join(tiles[tile_row*12 + tile][row])
+    #                   for tile in range(12)])
+    #          for row in range(8)
+    #          for tile_row in range(12)]
 
     for mod in range(8):
         image = mir_rot(total, mod)
-        monsters = 0
         h = len(image)
         w = len(image[0])
-        for y in range(h):
-            for x in range(w):
-                if has_monster(image, x, y, w, h):
-                    monsters += 1
+        monsters = sum(1 if has_monster(image, x, y, w, h) else 0
+                       for x in range(w)
+                       for y in range(h))
         if monsters != 0:
             return sum(row.count("#") for row in image) - monsters * 15
 
