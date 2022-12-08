@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+base=$(dirname $(pwd)/$0)/../
+who=$(python $base/personal_stats.py $base/leaderboard.json list | fzf)
+echo "stats for $who:"
+python $base/personal_stats.py $base/leaderboard.json show "$who"

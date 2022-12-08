@@ -3,10 +3,15 @@ import json
 import sys
 
 def main():
-    obj = json.loads(sys.stdin.read())
+    obj = json.loads(open(sys.argv[1], "r").read())
     members = obj["members"]
-    member_names = {mid: member["name"] for mid, member in members.items()}
+    member_names = {mid: member["name"] if member["name"] else ("Anon " + str(member["id"])) for mid, member in members.items()}
     member_ids = {v: k for k, v in member_names.items()}
+    if sys.argv[2] == "list":
+        print("\n".join(list(sorted(member_ids, key=str.lower))))
+        return
+    if sys.argv[2] != "show":
+        return
 
     stars = [([], []) for _ in range(25)]
     for m, member in members.items():
@@ -19,7 +24,7 @@ def main():
         d[0].sort()
         d[1].sort()
 
-    search_id = member_ids["Gustav Sörnäs"]
+    search_id = member_ids[sys.argv[3]]
     print("      ----------Part 1----------   ----------Part 2----------")
     print("Day           Time   Rank  Score           Time   Rank  Score")
     for d, dstars in reversed(list(enumerate(stars))):
@@ -58,7 +63,7 @@ def main():
                 if rank1_td.days > 99
                 else "{:2}d {:02}:{:02}:{:02}".format(
                     int(rank1_d),
-                    int(rank1_h),
+                    int(rank1_h%24),
                     int(rank1_m),
                     int(rank1_s),
                 ),
@@ -80,7 +85,7 @@ def main():
                 if rank2_td.days > 99
                 else "{:2}d {:02}:{:02}:{:02}".format(
                     int(rank2_d),
-                    int(rank2_h),
+                    int(rank2_h%24),
                     int(rank2_m),
                     int(rank2_s),
                 ),
@@ -90,12 +95,11 @@ def main():
         else:
             rank2_fmt = not_solved_fmt
 
-        print(" {:2}   {:8}  {:5}    {:3}   {:8}  {:5}    {:3}".format(
+        print(" {:2}   {:>12}  {:>5}    {:>3}   {:>12}  {:>5}    {:>3}".format(
             d+1,
             *rank1_fmt,
             *rank2_fmt,
         ))
-    print(total_
 
 
 main()

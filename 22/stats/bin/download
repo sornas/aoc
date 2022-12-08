@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+base=$(dirname $(pwd)/$0)/../
+leaderboard=$1
+# https://adventofcode.com/2022/leaderboard/private/view/1879790.json
+# https://adventofcode.com/2022/leaderboard/private/view/1879790.json
+wget https://adventofcode.com/2022/leaderboard/private/view/$leaderboard.json -O $base/leaderboard.json
