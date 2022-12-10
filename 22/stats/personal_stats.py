@@ -2,29 +2,43 @@ import datetime
 import json
 import sys
 
-def main():
-    obj = json.loads(open(sys.argv[1], "r").read())
-    members = obj["members"]
-    member_names = {mid: member["name"] if member["name"] else ("Anon " + str(member["id"])) for mid, member in members.items()}
-    member_ids = {v: k for k, v in member_names.items()}
-    if sys.argv[2] == "list":
-        print("\n".join(list(sorted(member_ids, key=str.lower))))
-        return
-    if sys.argv[2] != "show":
-        return
+def for_day(day, amount, member_names, stars):
+    problem_dt = datetime.datetime(year=2022, month=12, day=day+1, hour=6)
+    print(f"First {amount} users to get both stars on Day {day}:")
+    for i, (dt, member) in enumerate(stars[day-1][0][:amount]):
+        dt = datetime.datetime.fromtimestamp(dt)
+        td = dt - problem_dt
+        d = td.days
+        total_s = td.total_seconds()
+        h, rem = divmod(total_s, 60*60)
+        m, s = divmod(rem, 60)
+        print("{:3}) {}  {:02}:{:02}:{:02}  {}".format(
+            i+1,
+            dt.strftime("%b %d"),
+            int(h%24),
+            int(m),
+            int(s),
+            member_names[member]
+        ))
+    print(f"First {amount} users to get the first star on Day {day}:")
+    for i, (dt, member) in enumerate(stars[day-1][1][:amount]):
+        dt = datetime.datetime.fromtimestamp(dt)
+        td = dt - problem_dt
+        d = td.days
+        total_s = td.total_seconds()
+        h, rem = divmod(total_s, 60*60)
+        m, s = divmod(rem, 60)
+        print("{:3}) {}  {:02}:{:02}:{:02}  {}".format(
+            i+1,
+            dt.strftime("%b %d"),
+            int(h%24),
+            int(m),
+            int(s),
+            member_names[member]
+        ))
 
-    stars = [([], []) for _ in range(25)]
-    for m, member in members.items():
-        for d, d_stars in member["completion_day_level"].items():
-            if "1" in d_stars:
-                stars[int(d)-1][0].append((d_stars["1"]["get_star_ts"], m))
-            if "2" in d_stars:
-                stars[int(d)-1][1].append((d_stars["2"]["get_star_ts"], m))
-    for d in stars:
-        d[0].sort()
-        d[1].sort()
-
-    search_id = member_ids[sys.argv[3]]
+def for_user(user, members, member_ids, stars):
+    search_id = member_ids[user]
     print("      ----------Part 1----------   ----------Part 2----------")
     print("Day           Time   Rank  Score           Time   Rank  Score")
     for d, dstars in reversed(list(enumerate(stars))):
@@ -100,6 +114,32 @@ def main():
             *rank1_fmt,
             *rank2_fmt,
         ))
+
+
+def main():
+    obj = json.loads(open(sys.argv[1], "r").read())
+    members = obj["members"]
+    member_names = {mid: member["name"] if member["name"] else ("Anon " + str(member["id"])) for mid, member in members.items()}
+    member_ids = {v: k for k, v in member_names.items()}
+    if sys.argv[2] == "list":
+        print("\n".join(list(sorted(member_ids, key=str.lower))))
+        return
+
+    stars = [([], []) for _ in range(25)]
+    for m, member in members.items():
+        for d, d_stars in member["completion_day_level"].items():
+            if "1" in d_stars:
+                stars[int(d)-1][0].append((d_stars["1"]["get_star_ts"], m))
+            if "2" in d_stars:
+                stars[int(d)-1][1].append((d_stars["2"]["get_star_ts"], m))
+    for d in stars:
+        d[0].sort()
+        d[1].sort()
+
+    if sys.argv[2] == "show":
+        for_user(sys.argv[3], members, member_ids, stars)
+    elif sys.argv[2] == "day":
+        for_day(int(sys.argv[3]), int(sys.argv[4]), member_names, stars)
 
 
 main()

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+base=$(dirname $(pwd)/$0)/../
+for day in `seq $1 $2`
+do
+    python $base/personal_stats.py $base/leaderboard.json day $day $3
+    echo
+done

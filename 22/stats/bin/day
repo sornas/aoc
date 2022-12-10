@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+base=$(dirname $(pwd)/$0)/../
+python $base/personal_stats.py $base/leaderboard.json day $1 $2
