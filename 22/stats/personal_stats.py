@@ -3,9 +3,9 @@ import json
 import sys
 
 def for_day(day, amount, member_names, stars):
-    problem_dt = datetime.datetime(year=2022, month=12, day=day+1, hour=6)
+    problem_dt = datetime.datetime(year=2022, month=12, day=day, hour=6)
     print(f"First {amount} users to get both stars on Day {day}:")
-    for i, (dt, member) in enumerate(stars[day-1][0][:amount]):
+    for i, (dt, member) in enumerate(stars[day-1][1][:amount]):
         dt = datetime.datetime.fromtimestamp(dt)
         td = dt - problem_dt
         d = td.days
@@ -21,7 +21,7 @@ def for_day(day, amount, member_names, stars):
             member_names[member]
         ))
     print(f"First {amount} users to get the first star on Day {day}:")
-    for i, (dt, member) in enumerate(stars[day-1][1][:amount]):
+    for i, (dt, member) in enumerate(stars[day-1][0][:amount]):
         dt = datetime.datetime.fromtimestamp(dt)
         td = dt - problem_dt
         d = td.days
