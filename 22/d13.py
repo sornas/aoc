@@ -42,7 +42,7 @@ def main():
         if c[1]:
             return 0
         return -1
-    lines.sort(key=functools.cmp_to_key(lambda l, r: cmp_(l, r)))
+    lines.sort(key=functools.cmp_to_key(cmp_))
     lines = list(enumerate(lines[::-1]))
     print("2", math.prod(l[0]+1 for l in lines if l[1][1]))
 
