@@ -25,18 +25,18 @@ def main():
         return res
 
     seen = set()
-    paths = [(0, goal)]
+    paths = [(0, start)]
 
     while True:
         l, cur = heapq.heappop(paths)
         if cur in seen:
             continue
         seen.add(cur)
-        if m[cur] == ord('a'):
+        if cur == goal:
             print(l)
             break
         for n in ns(*cur):
-            if m[n] >= m[cur] - 1 and n not in seen: # <= <= ?
+            if m[n] <= m[cur] + 1 and n not in seen: # <= <= ?
                 heapq.heappush(paths, (l + 1, n))
 
 main()
