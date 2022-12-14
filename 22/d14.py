@@ -31,15 +31,14 @@ def main():
             if cand not in walls and cand not in sand:
                 cur = cand
                 break
-        if cur == prev:
+        if cur == prev or cur[1] == max_y + 1:
+            if cur == (500, 0):
+                print(len(sand) + 1)
+                break
             # everything is blocked, come at rest
             sand |= {cur}
             cur = (500, 0)
             continue
-        if cur[1] > max_y:
-            # fell of + L + ratio
-            print(len(sand))
-            break
 
 
 main()
