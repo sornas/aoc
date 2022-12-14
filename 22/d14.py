@@ -38,7 +38,7 @@ def main():
             cur = (500, 0)
             continue
         if cur[1] > max_y:
-            # fell of + L + ratio
+            # fell off + L + ratio
             print(len(sand))
             break
 

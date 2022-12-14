@@ -39,14 +39,15 @@ def for_day(day, amount, member_names, stars):
 
 def for_user(user, members, member_ids, stars):
     search_id = member_ids[user]
+    max_score = min(100, len(members))
     print("      ----------Part 1----------   ----------Part 2----------")
     print("Day           Time   Rank  Score           Time   Rank  Score")
     for d, dstars in reversed(list(enumerate(stars))):
         if not dstars[0]:
             continue
         
-        rank1 = 1
-        rank2 = 1
+        rank1 = 0
+        rank2 = 0
         for solve in dstars[0]:
             if solve[1] == search_id:
                 rank1 = (rank1, solve[0])
@@ -81,8 +82,8 @@ def for_user(user, members, member_ids, stars):
                     int(rank1_m),
                     int(rank1_s),
                 ),
-                rank1[0],
-                (len(members) - rank1[0]) if rank1[0] < len(members) else 0,
+                rank1[0] + 1,
+                (max_score - rank1[0]) if rank1[0] < max_score else 0,
             ]
         else:
             rank1_fmt = not_solved_fmt
@@ -103,8 +104,8 @@ def for_user(user, members, member_ids, stars):
                     int(rank2_m),
                     int(rank2_s),
                 ),
-                rank2[0],
-                (len(members) - rank2[0]) if rank2[0] < len(members) else 0,
+                rank2[0] + 1,
+                (max_score - rank2[0]) if rank2[0] < len(members) else 0,
             ]
         else:
             rank2_fmt = not_solved_fmt
