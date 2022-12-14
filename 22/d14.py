@@ -19,6 +19,29 @@ def main():
                 end = max(segs[i][0], segs[i + 1][0])
                 walls |= set(zip(range(start, end + 1), itertools.repeat(segs[i][1])))
     max_y = max(y for _, y in walls)
+
+    sand = set()
+    cur = (500, 0)
+    while True:
+        # try to move down
+        prev = cur
+        down = add(cur, (0, 1))
+        left = add(cur, (-1, 1))
+        right = add(cur, (1, 1))
+        for cand in [down, left, right]:
+            if cand not in walls and cand not in sand:
+                cur = cand
+                break
+        if cur == prev:
+            # everything is blocked, come at rest
+            sand |= {cur}
+            cur = (500, 0)
+            continue
+        if cur[1] > max_y:
+            # fell of + L + ratio
+            print(len(sand))
+            break
+
     sand = set()
     cur = (500, 0)
     while True:
