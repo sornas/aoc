@@ -25,40 +25,58 @@ def vis(sensors, beacons, not_beacons):
                 print(".", end="")
         print()
     
+# IDEA
+# the point we look for will be 1 step out of the border of one of the areas
+# for each sensor, we now the distance to its beacon
+# exactly 1 of the points will be farther than that from all sensors
 
 def main():
-    sensors = set()
+    sensors = dict()
     beacons = set()
     not_beacons = set()
-    target_y = 2000000
     for line in sys.stdin.readlines():
         match = re.match(r"Sensor at x=(-?\d+), y=(-?\d+): closest beacon is at x=(-?\d+), y=(-?\d+)", line)
-        sx, sy, cx, cy = list(map(int, match.groups()))
-        sensors |= {(sx, sy)}
-        beacons |= {(cx, cy)}
+        sx, sy, bx, by = list(map(int, match.groups()))
+        s = (sx, sy)
+        b = (bx, by)
+        sb_distance = md(s, b)
 
-        cd = md((sx, sy), (cx, cy))
-        for dy in range(cd+1):
-            if sy + dy == target_y:
-                for dx in range((cd - dy) + 1):
-                    not_beacons |= {(sx + dx, sy + dy)}
-                    not_beacons |= {(sx - dx, sy + dy)}
-            if sy - dy == target_y:
-                for dx in range((cd - dy) + 1):
-                    not_beacons |= {(sx + dx, sy - dy)}
-                    not_beacons |= {(sx - dx, sy - dy)}
+        # for each sensor, what is the distance to its closest beacon
+        sensors[s] = sb_distance
+        beacons |= {b}
 
-        td = abs(sy - target_y)
-        if td > target_y:
-            continue
-        # which of them are on this line?
-        # symmetrical triangle
-        # cd - td: max distance - distance to target y => how many on target line
-        on_target = abs(cd - td)
-        for x in range(-on_target, on_target + 1):
-            pass
-            #not_beacons |= {(sx + x, target_y)}
-    # vis(sensors, beacons, not_beacons)
-    print(len(not_beacons - beacons))
+    # .........
+    # ....c....
+    # ...c#c...
+    # ..c###c..
+    # .cb#s##c.
+    # ..c###c..
+    # ...c#c...
+    # ....c....
+    # .........
+
+    def try_cand(c):
+        cx, cy = c
+        return 0 <= cx <= 4000000 and 0 <= cy <= 4000000 and all(md(c, s) > dist for s, dist in sensors.items())
+
+    candidates = set()
+    for s, dist in sensors.items():
+        print(s)
+        sx, sy = s
+        for dy in range(-dist-1, dist+2):
+            if dy >= 0:
+                dx = dist+1 - dy
+            else:
+                dx = dist+1 + dy
+            candidate = (sx+dx, sy+dy)
+            if try_cand(candidate):
+                print(candidate, candidate[0] * 4000000 + candidate[1])
+                return
+            candidate = (sx-dx, sy+dy)
+            if try_cand(candidate):
+                print(candidate, candidate[0] * 4000000 + candidate[1])
+                return
+        # vis(set(sensors.keys()), beacons, candidates)
+        # print()
 
 main()
