@@ -12,9 +12,10 @@ def main():
             r"Valve (..) has flow rate=(\d+); tunnels? leads? to valves? ((..(, )?)+)$",
             line
         ).groups()
-        rate[valve] = int(rate_)
+        if rate_ != "0":
+            rate[valve] = int(rate_)
         tunnels[valve] = to.split(", ")
-    avail = frozenset(tunnels.keys())
+    avail = frozenset(rate.keys())
 
     @functools.cache
     def path_between(fr, to):
