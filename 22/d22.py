@@ -24,6 +24,21 @@ def main():
     pos = (min(x for x, y in tiles if y == 0), 0)
     direction = (1, 0)
 
+    faces = [(1,0), (2,0), (1,1), (1,2), (0,2), (0,3)]
+    pos_face = (pos[0] // 50, pos[1] // 50)
+    pos = (pos[0] % 50, pos[1] % 50)
+    print(pos_face, pos)
+
+    face_borders: [
+        #  RIGHT    DOWN     LEFT      UP
+        [ (1, 2),  (2, 3),  (3, 2),  (5, 2) ], # 0
+        [ (4, 0),  (2, 0),  (0, 0),  (5, 1) ], # 1
+        [ (1, 1),  (4, _),  (3, _),  (0, _) ], # 2
+        [ (4, _),  (5, _),  (0, _),  (2, _) ], # 3
+        [ (1, _),  (5, _),  (3, _),  (2, _) ], # 4
+        [ (1, _),  (2, _),  (3, _),  (5, _) ], # 5
+    ]
+
     def wrap(px, py, d):
         if d == (1, 0):
             # right, wrap left
@@ -41,6 +56,7 @@ def main():
             print(":(")
             sys.exit()
             
+    return
 
     for inst in regex.match(r"((\d+)|[LR])*", inst).captures(1):
         print(inst)
