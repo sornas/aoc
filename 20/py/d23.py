@@ -29,22 +29,19 @@ def pt1(inp):
     ...
 
 
-def 
-
-
 def pt2(inp):
     cups = list(map(int, inp[0].strip()))
-    m = max(cups)
-    # cups += list(range(max(cups) + 1, 1000000 + 1))
-    # m = 1000000
+    # m = max(cups)
+    cups += list(range(max(cups) + 1, 1000000 + 1))
+    m = 1000000
 
     nxt = [None for _ in range(m+1)]
     for a, b in zip(cups, cups[1:]):
         nxt[a] = b
-    nxt[m] = 1
+    nxt[b] = cups[0]
 
     curr = cups[0]
-    for i in range(100):
+    for i in range(10000000):
         if i % 100000 == 0:
             print(i // 100000)
         pick = [nxt[curr], nxt[nxt[curr]], nxt[nxt[nxt[curr]]]]
